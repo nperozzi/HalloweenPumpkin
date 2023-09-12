@@ -2,6 +2,7 @@
 Description: Compilation of methods for HalloweenPumpkin
 
 */
+#include "Arduino.h"
 #include <SPI.h>
 #include <SD.h>
 #include <FastLED.h>
