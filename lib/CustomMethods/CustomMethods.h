@@ -1,14 +1,17 @@
 #ifndef CUSTOMMETHODS_H
 #define CUSTOMMETHODS_H
 
+
+
 // Audio Elements:
-  // GUItool: begin automatically generated code
-  extern AudioPlaySdWav           playSdWav1;
-  extern AudioAmplifier           amp1;
-  extern AudioOutputAnalog        dac1;
-  extern AudioConnection          patchCord1(playSdWav1, 0, amp1, 0);
-  extern AudioConnection          patchCord2(amp1, dac1);
-  // GUItool: end automatically generated code
+// GUItool: begin automatically generated code
+extern AudioPlaySdWav           playSdWav1;
+extern AudioAmplifier           amp1;
+extern AudioOutputAnalog        dac1;
+AudioConnection          patchCord1(playSdWav1, 0, amp1, 0);
+AudioConnection          patchCord2(amp1, dac1);
+// GUItool: end automatically generated code
+  
 
 //Bluetooth Elements:
 const int NUM_FIELDS=4;
@@ -36,12 +39,12 @@ bool flag=true;
   //Strip1 elements: Candles Strip
     #define LED1_PIN 2
     #define NUM_LED1 20
-    CRGB Strip1[NUM_LED1];  
+    extern CRGB Strip1[NUM_LED1];  
 
   //Strip2 elements: Mini Pumpkings Strip
     #define LED2_PIN 3
     #define NUM_LED2 3
-    CRGB Strip2[NUM_LED2];  //Mini Pumpkings Strip
+    extern CRGB Strip2[NUM_LED2];  //Mini Pumpkings Strip
 
 //Create Objects for light sequences:
   FlashSequence flash= FlashSequence();

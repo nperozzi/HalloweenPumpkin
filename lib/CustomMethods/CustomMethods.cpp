@@ -2,7 +2,6 @@
 Description: Compilation of methods for HalloweenPumpkin
 
 */
-#include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
 #include <FastLED.h>
@@ -11,9 +10,6 @@ Description: Compilation of methods for HalloweenPumpkin
 
 #include "CustomMethods.h"
 #include "makeColor.h"
-
-
-
 
 void getSerialData(){
  

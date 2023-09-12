@@ -25,49 +25,41 @@ V2.1:
   - ColorWheel functionality
   - Changed the app to "HalloweenPumpkinAppV2"
 */ 
+#include "Arduino.h"
 #include <Audio.h>
+#include <FastLED.h>
 
-
-
-#include "FlashSequence.h"
-#include <MountainKing.h>
-
+#include "flashSequence.h"
+#include "mountainKing.h"
 #include "CustomMethods.h"
-
-
-
-
-
-
 
 //Desabling Interrupts
   #define FASTLED_ALLOW_INTERRUPTS 0  //TODO: Do I need to desable interrupts?
 
 
-
 void setup() {
   //Bluetooth Serial setup
-    Serial1.begin(9600);  //Defining communication rate with the HC-06 bluetooth module. Boud rate is 9600
-    Serial.begin(9600);   //Serial for debugging
+  Serial1.begin(9600);  //Defining communication rate with the HC-06 bluetooth module. Boud rate is 9600
+  Serial.begin(9600);   //Serial for debugging
   
   //Audio setup:
-    AudioMemory(8);
+  AudioMemory(8);
 
   //SD Card setup:
-    SPI.setMOSI(SDCARD_MOSI_PIN);
-    SPI.setSCK(SDCARD_SCK_PIN);
-  
-    if (!SD.begin(SDCARD_CS_PIN)) {
-        Serial1.println("Unable to access the SD card");
-        delay(500);
-    }
+  SPI.setMOSI(SDCARD_MOSI_PIN);
+  SPI.setSCK(SDCARD_SCK_PIN);
+
+  if (!SD.begin(SDCARD_CS_PIN)) {
+      Serial1.println("Unable to access the SD card");
+      delay(500);
+  }
   
   //FastLED Setup:
-    //Candles Strip setup:
-      FastLED.addLeds<WS2812, LED1_PIN, RGB> (Strip1, NUM_LED1);
-    //MiniPumpkins Strip setup:
-      FastLED.addLeds<WS2812, LED2_PIN, RGB> (Strip2, NUM_LED2);
-    FastLED.setBrightness(50);
+  //Candles Strip setup:
+  FastLED.addLeds<WS2812, LED1_PIN, RGB> (Strip1, NUM_LED1);
+  //MiniPumpkins Strip setup:
+  FastLED.addLeds<WS2812, LED2_PIN, RGB> (Strip2, NUM_LED2);
+  FastLED.setBrightness(50);
 
   //Volume Setup:
     amp1.gain(vol);                      //vol is a float. vol=0 is not sound. 0<vol<1.0 atenuation. 1.0<vol<32767.0
@@ -141,7 +133,7 @@ void loop() {
       break;
   
     //Track: ColorWheel
-    case 99:  
+    case 99:
       while(true){                   //While loop so the ColorWheel keeps going until the button "back" is pressed
         getSerialData();            //Teensy keeps on reading the serial1 port during the while loop
         fill_solid(Strip1, NUM_LED1, CRGB(serialData[1],serialData[2],serialData[3]));    //Strip1 follows the wheel color
