@@ -39,7 +39,7 @@ V2.1:
 //Desabling Interrupts
   #define FASTLED_ALLOW_INTERRUPTS 0  //TODO: Do I need to desable interrupts?
 //SD Card elements:
-  #define SDCARD_CS_PIN    BUILTIN_SDCARD
+  #define BUILTIN_SDCARD
   #define SDCARD_MOSI_PIN 11
   #define SDCARD_SCK_PIN 13
 
@@ -55,7 +55,7 @@ void setup() {
   SPI.setMOSI(SDCARD_MOSI_PIN);
   SPI.setSCK(SDCARD_SCK_PIN);
 
-  if (!SD.begin(SDCARD_CS_PIN)) {
+  if (!SD.begin(BUILTIN_SDCARD)) {
       Serial1.println("Unable to access the SD card");
       delay(500);
   }
