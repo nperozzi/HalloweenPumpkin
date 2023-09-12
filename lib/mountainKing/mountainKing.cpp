@@ -1,8 +1,8 @@
 
-#include "Arduino.h"
+//#include "Arduino.h"
 #include <FastLED.h>
-#include "CustomMethods.h"
-#include "mountainKing.h"
+//#include "CustomMethods.h"
+#include "MountainKing.h"
 
 
 void MountainKingSequence::runMountainKingSequence(int eventFrequency){

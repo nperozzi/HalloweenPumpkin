@@ -9,8 +9,6 @@ class MountainKingSequence{
   public:
     MountainKingSequence(){};          //Constructor
     void runMountainKingSequence(int eventFrequency);            //Member function prototype
-    
-  private:
 };
 
 #endif

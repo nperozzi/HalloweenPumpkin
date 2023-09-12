@@ -25,12 +25,10 @@ V2.1:
   - ColorWheel functionality
   - Changed the app to "HalloweenPumpkinAppV2"
 */ 
-#include "Arduino.h"
+
 #include <Audio.h>
 #include <FastLED.h>
 
-#include "flashSequence.h"
-#include "mountainKing.h"
 #include "CustomMethods.h"
 
 //Desabling Interrupts

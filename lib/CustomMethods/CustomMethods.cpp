@@ -2,15 +2,19 @@
 Description: Compilation of methods for HalloweenPumpkin
 
 */
-#include "Arduino.h"
+#include "CustomMethods.h"
+
+//#include <Arduino.h>
 #include <SPI.h>
 #include <SD.h>
 #include <FastLED.h>
 #include <SerialFlash.h>
 #include <Audio.h>
 
-#include "CustomMethods.h"
+
+#include "MountainKing.h"
 #include "makeColor.h"
+#include "flashSequence.h"
 
 void getSerialData(){
  
