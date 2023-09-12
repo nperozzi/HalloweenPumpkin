@@ -2,13 +2,14 @@
 #define CUSTOMMETHODS_H
 
 #include "Arduino.h"
-#include <SerialFlash.h>
 #include <Audio.h>
+#include <SerialFlash.h>
+
 
 // Audio Elements:
 // GUItool: begin automatically generated code
 AudioPlaySdWav           playSdWav1;
-extern AudioAmplifier           amp1;
+AudioAmplifier           amp1;
 AudioOutputAnalog        dac1;
 AudioConnection          patchCord1(playSdWav1, 0, amp1, 0);
 AudioConnection          patchCord2(amp1, dac1);
@@ -22,19 +23,16 @@ uint8_t serialData[NUM_FIELDS];
 uint8_t storedSerialData[NUM_FIELDS];
 bool flag=true;
 
-//SD Card elements:
-  #define SDCARD_CS_PIN    BUILTIN_SDCARD
-  #define SDCARD_MOSI_PIN 11
-  #define SDCARD_SCK_PIN 13
-  char* PlayList[]={"Boo.wav",
-                    "Scream.wav",
-                    "EvilLaugh.wav",
-                    "Witch.wav",
-                    "Gotcha.wav",
-                    "AGoodLook.wav",
-                    "Thriler01.wav",
-                    "MountainKing.wav",
-                    "HarryPotter.wav"};
+
+  char* PlayList[] = {"Boo.wav",
+                      "Scream.wav",
+                      "EvilLaugh.wav",
+                      "Witch.wav",
+                      "Gotcha.wav",
+                      "AGoodLook.wav",
+                     "Thriler01.wav",
+                      "MountainKing.wav",
+                      "HarryPotter.wav"};
 
 //FastLED elements:
   //Strip1 elements: Candles Strip

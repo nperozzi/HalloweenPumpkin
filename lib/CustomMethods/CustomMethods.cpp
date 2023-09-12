@@ -8,7 +8,6 @@ Description: Compilation of methods for HalloweenPumpkin
 #include <FastLED.h>
 
 
-
 #include "MountainKing.h"
 #include "makeColor.h"
 #include "flashSequence.h"

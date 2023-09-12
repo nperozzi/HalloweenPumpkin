@@ -27,13 +27,21 @@ V2.1:
 */ 
 
 #include <Audio.h>
+#include <SerialFlash.h>
+
+#include <SPI.h>
+#include <SD.h>
+
 #include <FastLED.h>
 
 #include "CustomMethods.h"
 
 //Desabling Interrupts
   #define FASTLED_ALLOW_INTERRUPTS 0  //TODO: Do I need to desable interrupts?
-
+//SD Card elements:
+  #define SDCARD_CS_PIN    BUILTIN_SDCARD
+  #define SDCARD_MOSI_PIN 11
+  #define SDCARD_SCK_PIN 13
 
 void setup() {
   //Bluetooth Serial setup
