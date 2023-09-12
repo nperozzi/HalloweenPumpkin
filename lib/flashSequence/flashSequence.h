@@ -5,6 +5,7 @@ Description: Contains the class to generate flashing light sequences.
 #ifndef FLASHSEQUENCE_H
 #define FLASHSEQUENCE_H
 
+#include "Arduino.h"
 
 class FlashSequence{
   public:

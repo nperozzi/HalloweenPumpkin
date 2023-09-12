@@ -1,7 +1,7 @@
 
-//#include "Arduino.h"
+
 #include <FastLED.h>
-//#include "CustomMethods.h"
+#include "CustomMethods.h"
 #include "MountainKing.h"
 
 
