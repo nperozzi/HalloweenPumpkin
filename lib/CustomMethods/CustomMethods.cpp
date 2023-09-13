@@ -3,15 +3,21 @@ Description: Compilation of methods for HalloweenPumpkin
 
 */
 
-#include "Arduino.h"
+//#include "Arduino.h"
 #include <Audio.h>
 #include <SerialFlash.h>
 #include <SPI.h>
 #include <SD.h>
 #include <FastLED.h>
 
+
+
 #include "makeColor.h"
 #include "CustomMethods.h"
+
+//Forward Declarations:
+//Audio Library:
+
 
 //Create Objects for light sequences:
 FlashSequence flash= FlashSequence();

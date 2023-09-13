@@ -15,9 +15,10 @@ const int NUM_FIELDS=4;
 int fieldIndex=0;
 uint8_t values[NUM_FIELDS];
 uint8_t serialData[NUM_FIELDS];
-uint8_t storedSerialData[NUM_FIELDS];
-bool flag=true;
+//uint8_t storedSerialData[NUM_FIELDS];
+//bool flag=true;  [REMOVE]
 
+extern float vol = 0.1;
 
 char* PlayList[] = {"Boo.wav",
                     "Scream.wav",
@@ -57,8 +58,6 @@ class FlashSequence{
     uint32_t lastEvent=0; //timestamp for the previous event  
 };
 
-//Volume elements:
-float vol=0.1;
 
 void getSerialData();
 
