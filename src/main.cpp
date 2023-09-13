@@ -25,15 +25,15 @@ V2.1:
   - ColorWheel functionality
   - Changed the app to "HalloweenPumpkinAppV2"
 */ 
-
+//Audio Libraries
 #include <Audio.h>
 #include <SerialFlash.h>
-
+//SD Libraries
 #include <SPI.h>
 #include <SD.h>
-
+//LED Libraries
 #include <FastLED.h>
-
+//Other Libraries
 #include "CustomMethods.h"
 
 //Desabling Interrupts

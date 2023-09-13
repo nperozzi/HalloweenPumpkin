@@ -3,17 +3,15 @@ Description: Compilation of methods for HalloweenPumpkin
 
 */
 
+#include "Arduino.h"
+#include <Audio.h>
+#include <SerialFlash.h>
 #include <SPI.h>
 #include <SD.h>
 #include <FastLED.h>
 
-
-#include "MountainKing.h"
 #include "makeColor.h"
-#include "flashSequence.h"
 #include "CustomMethods.h"
-
-
 
 //Create Objects for light sequences:
 FlashSequence flash= FlashSequence();
@@ -228,4 +226,31 @@ void Volume(int value){
       Serial.println(vol);
       break;
   }
+}
+
+void MountainKingSequence::runMountainKingSequence(int eventFrequency){
+    fill_solid(Strip1, NUM_LED1, CRGB::Black);
+    
+    //MiniPumpkins Dance
+    EVERY_N_MILLISECONDS(eventFrequency){
+      //Create a new pixel for led[0]:
+      Strip2[0]=CHSV(random8(), random8(), random8(100, 255));
+    
+      //Copy each pixel to the next one
+      for( int i=3-1; i>0; i--){
+        Strip2[i]= Strip2[i-1];
+      }
+      FastLED.show();
+    }
+}
+
+void FlashSequence::runFlashSequence(CRGB color, uint32_t eventFrequency){
+  uint32_t timeStamp= millis();
+
+  if((timeStamp - lastEvent)>= eventFrequency){
+    fill_solid(Strip1, NUM_LED1, isOn? CRGB::Black : color);
+    isOn=!isOn;
+    lastEvent=millis();
+  }
+  FastLED.show();  
 }
