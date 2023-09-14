@@ -1,45 +1,42 @@
 #ifndef CUSTOMMETHODS_H
 #define CUSTOMMETHODS_H
 
-// Audio Elements:
-// GUItool: begin automatically generated code
-AudioPlaySdWav           playSdWav1;
-AudioAmplifier           amp1;
-AudioOutputAnalog        dac1;
-AudioConnection          patchCord1(playSdWav1, 0, amp1, 0);
-AudioConnection          patchCord2(amp1, dac1);
-// GUItool: end automatically generated code
+#include <Audio.h>
+#include <SerialFlash.h>
+#include <SPI.h>
+#include <SD.h>
+#include <FastLED.h>
 
-//Bluetooth Elements:
-const int NUM_FIELDS=4;
-int fieldIndex=0;
-uint8_t values[NUM_FIELDS];
-uint8_t serialData[NUM_FIELDS];
-//uint8_t storedSerialData[NUM_FIELDS];
-//bool flag=true;  [REMOVE]
-
-extern float vol = 0.1;
-
-char* PlayList[] = {"Boo.wav",
-                    "Scream.wav",
-                    "EvilLaugh.wav",
-                    "Witch.wav",
-                    "Gotcha.wav",
-                    "AGoodLook.wav",
-                    "Thriler01.wav",
-                    "MountainKing.wav",
-                    "HarryPotter.wav"};
+//Variable Declarations
+extern float vol;
 
 //FastLED elements:
   //Strip1 elements: Candles Strip
     #define LED1_PIN 2
     #define NUM_LED1 20
-    extern CRGB Strip1[NUM_LED1];  
+    extern CRGB Strip1[NUM_LED1];
 
   //Strip2 elements: Mini Pumpkings Strip
     #define LED2_PIN 3
     #define NUM_LED2 3
     extern CRGB Strip2[NUM_LED2];  //Mini Pumpkings Strip
+
+// Audio Elements:
+// GUItool: begin automatically generated code
+extern AudioPlaySdWav           playSdWav1;
+extern AudioAmplifier           amp1;
+extern AudioOutputAnalog        dac1;
+extern AudioConnection          patchCord1;
+extern AudioConnection          patchCord2;
+// GUItool: end automatically generated code
+
+//Bluetooth Elements:
+const int NUM_FIELDS = 4;
+extern int fieldIndex;
+extern uint8_t values[NUM_FIELDS];
+extern uint8_t serialData[NUM_FIELDS];
+//uint8_t storedSerialData[NUM_FIELDS];
+//bool flag=true;  [REMOVE]
 
 //Classes:
 class MountainKingSequence{

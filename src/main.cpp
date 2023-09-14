@@ -26,18 +26,16 @@ V2.1:
   - Changed the app to "HalloweenPumpkinAppV2"
 */ 
 //Audio Libraries
-#include <Audio.h>
-#include <SerialFlash.h>
-//SD Libraries
-#include <SPI.h>
-#include <SD.h>
-//LED Libraries
-#include <FastLED.h>
-//Other Libraries
+//#include <Audio.h>
+//#include <SerialFlash.h>
+//#include <SPI.h>
+//#include <SD.h>
+//#include <FastLED.h>
 #include "CustomMethods.h"
 
 //Desabling Interrupts
   #define FASTLED_ALLOW_INTERRUPTS 0  //TODO: Do I need to desable interrupts?
+
 //SD Card elements:
   #define BUILTIN_SDCARD
   #define SDCARD_MOSI_PIN 11
@@ -56,8 +54,8 @@ void setup() {
   SPI.setSCK(SDCARD_SCK_PIN);
 
   if (!SD.begin(BUILTIN_SDCARD)) {
-      Serial1.println("Unable to access the SD card");
-      delay(500);
+    Serial1.println("Unable to access the SD card");
+    delay(500);
   }
   
   //FastLED Setup:

@@ -4,19 +4,38 @@ Description: Compilation of methods for HalloweenPumpkin
 */
 
 //#include "Arduino.h"
-#include <Audio.h>
-#include <SerialFlash.h>
-#include <SPI.h>
-#include <SD.h>
-#include <FastLED.h>
-
 
 
 #include "makeColor.h"
 #include "CustomMethods.h"
 
-//Forward Declarations:
-//Audio Library:
+//Variable Definitions and Initialization
+float vol = 0.1;
+CRGB Strip1[NUM_LED1];
+CRGB Strip2[NUM_LED2];
+int fieldIndex= 0;
+uint8_t values[NUM_FIELDS];
+uint8_t serialData[NUM_FIELDS];
+
+// Audio Elements:
+// GUItool: begin automatically generated code
+AudioPlaySdWav           playSdWav1;
+AudioAmplifier           amp1;
+AudioOutputAnalog        dac1;
+AudioConnection          patchCord1(playSdWav1, 0, amp1, 0);
+AudioConnection          patchCord2(amp1, dac1);
+// GUItool: end automatically generated code
+
+char* PlayList[] = {"Boo.wav",
+                    "Scream.wav",
+                    "EvilLaugh.wav",
+                    "Witch.wav",
+                    "Gotcha.wav",
+                    "AGoodLook.wav",
+                    "Thriler01.wav",
+                    "MountainKing.wav",
+                    "HarryPotter.wav"};
+
 
 
 //Create Objects for light sequences:
