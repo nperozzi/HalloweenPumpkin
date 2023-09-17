@@ -1,13 +1,5 @@
-/*CustomMethods
-Description: Compilation of methods for HalloweenPumpkin
-
-*/
-
-//#include "Arduino.h"
-
-
 #include "makeColor.h"
-#include "CustomMethods.h"
+#include "helper.h"
 
 //Variable Definitions and Initialization
 float vol = 0.02;
@@ -26,8 +18,11 @@ AudioConnection          patchCord1(playSdWav1, 0, amp1, 0);
 AudioConnection          patchCord2(amp1, dac1);
 // GUItool: end automatically generated code
 
-#define num_tracks 9
+//Create Objects for light sequences:
+FlashSequence flash= FlashSequence();
+MountainKingSequence mountainKing= MountainKingSequence();
 
+#define num_tracks 9
 char PlayList[num_tracks][20] = {"Boo.wav",
                                 "Scream.wav",
                                 "EvilLaugh.wav",
@@ -37,12 +32,6 @@ char PlayList[num_tracks][20] = {"Boo.wav",
                                 "Thriler01.wav",
                                 "MountainKing.wav",
                                 "HarryPotter.wav"};
-
-
-
-//Create Objects for light sequences:
-FlashSequence flash= FlashSequence();
-MountainKingSequence mountainKing= MountainKingSequence();
 
 void getSerialData()  //TODO: Why the serial data is a array of 4?
 {

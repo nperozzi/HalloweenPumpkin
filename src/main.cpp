@@ -1,4 +1,4 @@
-/* [DELETE]: Line to test the Github connection
+/*
 HalloweenPumpkinV3
 Decription:
   A HalloweenPumpkin that reproduces "tracks" (sound and a light sequence) when triggered via bluetooth.
@@ -9,7 +9,7 @@ Hardware:
 Version:
   Code migrated to PlatformIO
 */ 
-#include "CustomMethods.h"
+#include "helper.h"
 
 //Desabling Interrupts
 //#define FASTLED_ALLOW_INTERRUPTS 0  //NOTE: seems to work without desabling interrupts.
