@@ -1,4 +1,5 @@
-/* HalloweenPumpkinV3
+/* [DELETE]: Line to test the Github connection
+HalloweenPumpkinV3
 Decription:
   A HalloweenPumpkin that reproduces "tracks" (sound and a light sequence) when triggered via bluetooth.
   The bluetooth transmitor the MIT App Inventory app "HalloweenPumpkinAppV2"
