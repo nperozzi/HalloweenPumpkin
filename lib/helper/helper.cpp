@@ -1,13 +1,13 @@
 #include "makeColor.h"
 #include "helper.h"
 
+
+
 //Variable Definitions and Initialization
 float vol = 0.02;
 CRGB Strip1[NUM_LED1];
 CRGB Strip2[NUM_LED2];
-int fieldIndex = 0;
-uint8_t values[NUM_FIELDS];
-uint8_t serialData[NUM_FIELDS];
+uint8_t serialData[NUM_FIELDS] = {0, 0};
 
 // Audio Elements:
 // GUItool: begin automatically generated code
@@ -33,37 +33,32 @@ char PlayList[num_tracks][20] = {"Boo.wav",
                                 "MountainKing.wav",
                                 "HarryPotter.wav"};
 
-void getSerialData()  //TODO: Why the serial data is a array of 4?
+void getSerialData()
 {
+  int i = 0;
   while(Serial1.available())
   {
     char ch = Serial1.read();
-    if(ch >= '0' && ch <= '9')             //Add up the chars camming into the serial to build each element of the array
+    if(ch >= '0' && ch <= '9')
     {
-      values[fieldIndex] = (values[fieldIndex] * 10) + (ch - '0');
+      serialData[i] = (serialData[i] * 10) + (ch - '0');
     }
-    else if(ch == ',')                  //If there is a "," it means that one emenet has ended and it is time to sart adding up the next elment
+    else if(ch == ',')
     {
-      if(fieldIndex < NUM_FIELDS - 1){
-        fieldIndex++;
+      if(i < NUM_FIELDS){
+        i++;
       }
     }
-    else if(ch == 'F')                   //If there is an "F", that means that one array has ended and it is time to start reading the next one.
+    else if(ch == 'F')          //TODO: is this really needed?
     {
-      for(int i = 0; i <= NUM_FIELDS - 1; i++)
-      {
-        serialData[i] = values[i];
-        values[i] = 0;
-      }
-      fieldIndex = 0;
+      break;
     }
   }
 }
 
-//Function to make the serialData array (0,0,0,0)
 void cleanSerialData()
 {
-  for(int i = 0; i <= NUM_FIELDS - 1; i++)
+  for(int i = 0; i < NUM_FIELDS; i++)
   {
     serialData[i] = 0; 
   }
@@ -73,7 +68,7 @@ void Play(int track, CRGB::HTMLColorCode color)
 {
   if(playSdWav1.isPlaying() != true)
   {
-    Serial1.println("PlayingBoo");  //indicates the app that something is playing
+    Serial1.println("PlayingTrack");  //indicates the app that something is playing
     playSdWav1.play(PlayList[track - 1]);
     delay(20);
     while(playSdWav1.isPlaying() == true)
@@ -163,31 +158,25 @@ void FlashMultiColor()
   }
 }
 
-void Volume(int value)
+void Vol()
 {
-  switch (value)  //TODO: Maybe this can be an if instead of a switch?
+  while(Serial1.available())
   {
-    case 101:
-      vol = vol + 0.02; //TODO: No hardcoded values
-      if(vol >= 0.6)   //TODO: Can I use a "constrain" function here?
-      {
-        vol=0.6;
-      }
+    char ch = Serial1.read();
+    if(ch == '+')
+    {
+      vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
       amp1.gain(vol);
       Serial1.println(vol);
-      Serial.println(vol);  //DEBUGGING LINE
-      break;
-      
-    case 100:
-      vol=vol-0.02;
-      if(vol>=0.6)           //TODO: Test if you can push the limit higher
-      {
-        vol=0.6;
-      }
-      amp1.gain(vol);
-      Serial1.println(vol);
-      Serial.println(vol); //DEBUGGING LINE
-      break;
+      //Serial.println(vol);  //DEBUGGING LINE
+    }
+    else if(ch == '-')
+    {
+        vol = constrain(vol - VOL_CHANGE, VOL_MIN, VOL_MAX);
+        amp1.gain(vol);
+        Serial1.println(vol);
+        //Serial.println(vol); //DEBUGGING LINE
+    }
   }
 }
 

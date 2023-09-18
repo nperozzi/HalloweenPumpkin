@@ -8,35 +8,34 @@
 #include <FastLED.h>
 
 //Variable Declarations
-extern float vol;
+  extern float vol;
+  #define VOL_CHANGE 0.2
+  #define VOL_MIN 0.0
+  #define VOL_MAX 0.6
 
-//FastLED elements:
+  //FastLED elements:
   //Strip1 elements: Candles Strip
-    #define LED1_PIN 2
-    #define NUM_LED1 20
-    extern CRGB Strip1[NUM_LED1];
+  #define LED1_PIN 2
+  #define NUM_LED1 20
+  extern CRGB Strip1[NUM_LED1];
 
   //Strip2 elements: Mini Pumpkings Strip
-    #define LED2_PIN 3
-    #define NUM_LED2 3
-    extern CRGB Strip2[NUM_LED2];  //Mini Pumpkings Strip
+  #define LED2_PIN 3
+  #define NUM_LED2 3
+  extern CRGB Strip2[NUM_LED2];
 
-// Audio Elements:
-// GUItool: begin automatically generated code
-extern AudioPlaySdWav           playSdWav1;
-extern AudioAmplifier           amp1;
-extern AudioOutputAnalog        dac1;
-extern AudioConnection          patchCord1;
-extern AudioConnection          patchCord2;
-// GUItool: end automatically generated code
+  // Audio Elements:
+  // GUItool: begin automatically generated code
+  extern AudioPlaySdWav           playSdWav1;
+  extern AudioAmplifier           amp1;
+  extern AudioOutputAnalog        dac1;
+  extern AudioConnection          patchCord1;
+  extern AudioConnection          patchCord2;
+  // GUItool: end automatically generated code
 
-//Bluetooth Elements:
-const int NUM_FIELDS = 4;
-extern int fieldIndex;
-extern uint8_t values[NUM_FIELDS];
-extern uint8_t serialData[NUM_FIELDS];
-//uint8_t storedSerialData[NUM_FIELDS];
-//bool flag=true;  [REMOVE]
+  //Bluetooth Elements:
+  const int NUM_FIELDS = 2;
+  extern uint8_t serialData[NUM_FIELDS];
 
 //Classes:
 class MountainKingSequence{
@@ -55,7 +54,6 @@ class FlashSequence{
     uint32_t lastEvent=0; //timestamp for the previous event  
 };
 
-
 void getSerialData();
 
 void cleanSerialData();
@@ -68,6 +66,6 @@ void Candles();
 
 void FlashMultiColor();
 
-void Volume(int value);
+void Vol();
 
 #endif

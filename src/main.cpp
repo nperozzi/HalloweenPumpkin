@@ -25,7 +25,7 @@ void setup()
 {
   //Bluetooth Serial setup
   Serial1.begin(9600);  //Defining communication rate with the HC-06 bluetooth module. Boud rate is 9600
-  Serial.begin(9600);   //Serial for debugging
+  Serial.begin(9600);   //SERIAL FOR DEBUGGING
   
   //Audio setup:
   AudioMemory(8);
@@ -33,8 +33,7 @@ void setup()
   //SD Card setup:
   SPI.setMOSI(SDCARD_MOSI_PIN);
   SPI.setSCK(SDCARD_SCK_PIN);
-
-  if (!SD.begin(BUILTIN_SD_CARD))
+  if (!SD.begin(BUILTIN_SD_CARD))                                                 //TODO: This message has no effect on the app.
   {
     Serial1.println("Unable to access the SD card");
     delay(500);
@@ -46,73 +45,28 @@ void setup()
   FastLED.setBrightness(50);
 
   //Volume Setup:
-  amp1.gain(vol);   //vol is a float. vol=0 is not sound. 0.0<vol<1.0 atenuation. 1.0<vol<32767.0
-  Serial1.println(vol);
+  attachInterrupt(digitalPinToInterrupt(0), Vol, FALLING);
+  amp1.gain(vol);   //vol is a float. vol=0 is not sound. 0.0<vol<1.0 atenuation.
+  Serial1.println(vol);                                                          //TODO: make sure that the app does something with this
 }
 
 void loop()
 {
-  getSerialData();
-  switch(serialData[0])
+  while(Serial1.available())
   {
+    getSerialData();
+    switch(serialData[0])
+    {
     //Track: Boo!
-    case 1:                             //When serialData[0] is 1, then the track is triggered
+    case 1:
       Play(serialData[0], CRGB::White);
       break;
-  
-    //Track: Scream
-    case 2:
-      Play(serialData[0], CRGB::Green);
-      break;
-        
-    //Track: EvilLaugh
-    case 3:
-      Play(serialData[0], CRGB::Red);
-      break;
-  
     //Track: Thriler01
     case 7:
       Play(serialData[0], 0);
-      Serial1.println("Available");
       break;
-  
-    //Track MountainKing
-    case 8:
-      Play(serialData[0], 1);
-      Serial1.println("Available");
-      break;
-        
-    //Track: HarryPotter
-    case 9:
-      Play(serialData[0], 2);
-      Serial1.println("Available");
-      break;
-  
-    //Track: ColorWheel
-    case 99:
-      while(true){                   //While loop so the ColorWheel keeps going until the button "back" is pressed
-        getSerialData();            //Teensy keeps on reading the serial1 port during the while loop
-        fill_solid(Strip1, NUM_LED1, CRGB(serialData[1],serialData[2],serialData[3]));    //Strip1 follows the wheel color
-        fill_solid(Strip2, NUM_LED2, CRGB(serialData[1],serialData[2],serialData[3]));    //Strip2 follows the wheel color
-        FastLED.show();                                                                   //FastLED shows the color on the strips
-        if(serialData[0]==98){      //Button "Back" is pressed
-          break;
-        }
-      }
-      break;
-
-    //Volumn +:
-    case 101:
-      Volume(serialData[0]);
-      break;
-      
-    //Volumn -:
-    case 100:
-      Volume(serialData[0]);
-      break;
-    
-    default:
-      Candles();
+    }
   }
-  cleanSerialData();              //serialData array is set to zero so it continues playing Candles. 
+  Candles();
+  cleanSerialData();
 }
