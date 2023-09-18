@@ -69,123 +69,51 @@ void cleanSerialData()
   }
 }
 
-void Play(int value)
+void Play(int track, CRGB::HTMLColorCode color)
 {
-  if(playSdWav1.isPlaying() == false)
+  if(playSdWav1.isPlaying() != true)
   {
-    switch(value)
-    {  
-      case 1: //Play: Boo!       TODO: Reduce repetition. make each case a signle function.
-        Serial1.println("PlayingBoo");
-        playSdWav1.play(PlayList[value - 1]);           //Playing "value-1" beause that is the position of the right song on the PlayList array.
-        delay(20);                                    // wait for library to pass WAV info
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::White, 60);    //60 is the frequency of the fliquering, which seems right for the song.
-          fill_solid(Strip2, NUM_LED2, CRGB::Black); //Turn off Strip2
-        }
-        break;
+    Serial1.println("PlayingBoo");  //indicates the app that something is playing
+    playSdWav1.play(PlayList[track - 1]);
+    delay(20);
+    while(playSdWav1.isPlaying() == true)
+    {
+      flash.runFlashSequence(color, 60);    //60 is the frequency of the fliquering, which seems right for the song.
+      fill_solid(Strip2, NUM_LED2, CRGB::Black); //Turn off Strip2
+    }
+    Serial1.println("Available");  //signals the app that nothing is playing
+  }
+}
 
-      //Play: Scream
-      case 2:
-        Serial1.println("PlayingScream");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::Green, 60); 
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-        }
-        break;
-
-      //Play: EvilLaugh
-      case 3:
-        Serial1.println("PlayingEvilLaugh");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::Red, 60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-        }
-        break;
-
-      //Play: Witch
-      case 4:
-        Serial1.println("PlayingWitch");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::Green, 60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-        }
-        break;
-
-      //Play: Gotcha
-      case 5:
-        Serial1.println("PlayingGotcha");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::Red, 60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black); 
-        }
-        break;
-
-      //Play: AGoodLook
-      case 6:
-        Serial1.println("PlayingAGoodLook");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::White, 60); 
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-        }
-        break;
-
-      //Play: Thriler01
-      case 7:
-        Serial1.println("PlayingThriler");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true) {
+void Play(int track, uint8_t light)
+{
+  if(playSdWav1.isPlaying() != true)
+  {
+    Serial1.println("PlayingTrack");
+    playSdWav1.play(PlayList[track - 1]);
+    delay(20);
+    while(playSdWav1.isPlaying() == true)
+    {
+      switch(light)
+      {
+        case 0:
           FlashMultiColor();
-        }
-        break;
-
-      //Play: MountainKing
-      case 8:
-        Serial1.println("PlayingMountainKing");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
+          break;
+        case 1:
           mountainKing.runMountainKingSequence(500);
-          
           //MountainKing boo flash
-          unsigned int time1=6858;
-          while(playSdWav1.positionMillis() >= time1)
+          while(playSdWav1.positionMillis() >= 6858)
           {
             flash.runFlashSequence(CRGB::White, 60);
             fill_solid(Strip2, NUM_LED2, CRGB::White);
           }
-        }
-        break;
-
-      //Play: HarryPotter
-      case 9:
-        Serial1.println("PlayingHarryPotter");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
+          break;
+        case 2:
           mountainKing.runMountainKingSequence(1000);
-        }
-        break;
+          break;
+      }
     }
+    Serial1.println("Available");
   }
 }
 
@@ -292,3 +220,4 @@ void FlashSequence::runFlashSequence(CRGB color, uint32_t eventFrequency)
   }
   FastLED.show();  
 }
+

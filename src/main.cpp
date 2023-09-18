@@ -8,6 +8,8 @@ Hardware:
   This code has been made to work on a Teensy 3.5 according to the schematics in the project files.
 Version:
   Code migrated to PlatformIO
+
+  TODO: Add "U can´t touch this by MC Hummer"
 */ 
 #include "helper.h"
 
@@ -53,62 +55,36 @@ void loop()
   getSerialData();
   switch(serialData[0])
   {
-    //Track: Candles. This is the default track since every time a track finished the serialData array is reset to (0,0,0,0)
-    case 0:
-      Candles();
-      break;
-    
     //Track: Boo!
     case 1:                             //When serialData[0] is 1, then the track is triggered
-      Play(serialData[0]);
-      Serial1.println("Available");     //Teensy sends "Available" back to the app so it enables all bottons
+      Play(serialData[0], CRGB::White);
       break;
   
     //Track: Scream
     case 2:
-      Play(serialData[0]);
-      Serial1.println("Available");
+      Play(serialData[0], CRGB::Green);
       break;
         
     //Track: EvilLaugh
     case 3:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
-
-    //Track: Witch
-    case 4:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
-  
-    //Track: Gotcha
-    case 5:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
-  
-    //Track: AGoodLook
-    case 6:
-      Play(serialData[0]);
-      Serial1.println("Available");
+      Play(serialData[0], CRGB::Red);
       break;
   
     //Track: Thriler01
     case 7:
-      Play(serialData[0]);
+      Play(serialData[0], 0);
       Serial1.println("Available");
       break;
   
     //Track MountainKing
     case 8:
-      Play(serialData[0]);
+      Play(serialData[0], 1);
       Serial1.println("Available");
       break;
         
     //Track: HarryPotter
     case 9:
-      Play(serialData[0]);
+      Play(serialData[0], 2);
       Serial1.println("Available");
       break;
   
@@ -134,6 +110,9 @@ void loop()
     case 100:
       Volume(serialData[0]);
       break;
+    
+    default:
+      Candles();
   }
   cleanSerialData();              //serialData array is set to zero so it continues playing Candles. 
 }

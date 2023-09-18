@@ -60,7 +60,9 @@ void getSerialData();
 
 void cleanSerialData();
 
-void Play(int value);
+void Play(int track, CRGB::HTMLColorCode color);
+
+void Play(int value, uint8_t light);
 
 void Candles();
 
