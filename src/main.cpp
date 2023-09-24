@@ -30,43 +30,64 @@ void setup()
   //Audio setup:
   AudioMemory(8);
 
-  //SD Card setup:
-  SPI.setMOSI(SDCARD_MOSI_PIN);
-  SPI.setSCK(SDCARD_SCK_PIN);
-  if (!SD.begin(BUILTIN_SD_CARD))                                                 //TODO: This message has no effect on the app.
-  {
-    Serial1.println("Unable to access the SD card");
-    delay(500);
-  }
-  
   //FastLED Setup:
   FastLED.addLeds<WS2812, LED1_PIN, RGB> (Strip1, NUM_LED1); //Candles Strip setup
   FastLED.addLeds<WS2812, LED2_PIN, RGB> (Strip2, NUM_LED2); //MiniPumpkins Strip setup
   FastLED.setBrightness(50);
+  fill_solid(Strip1, NUM_LED1, CRGB::Black);  //TODO: light do not start att off.
+  fill_solid(Strip2, NUM_LED2, CRGB::Black);
+
+  //SD Card setup:
+  SPI.setMOSI(SDCARD_MOSI_PIN);
+  SPI.setSCK(SDCARD_SCK_PIN);
+  SD.begin(BUILTIN_SD_CARD);
+
+  //Save list of songs
+  File root = SD.open("/");
+  if (root)
+  {
+    while(File file = root.openNextFile())
+    {
+      strcpy(songs[songs_count], file.name());
+      songs_count++;
+      file.close();
+    }
+    root.close();
+  }
+
+  sendSongs();
 
   //Volume Setup:
-  attachInterrupt(digitalPinToInterrupt(0), Vol, FALLING);
   amp1.gain(vol);   //vol is a float. vol=0 is not sound. 0.0<vol<1.0 atenuation.
-  Serial1.println(vol);                                                          //TODO: make sure that the app does something with this
 }
 
 void loop()
 {
-  while(Serial1.available())
+  if(playSdWav1.isPlaying() != true)
   {
     getSerialData();
-    switch(serialData[0])
+    if(serialData[0] != 0)
     {
-    //Track: Boo!
-    case 1:
-      Play(serialData[0], CRGB::White);
-      break;
-    //Track: Thriler01
-    case 7:
-      Play(serialData[0], 0);
-      break;
+    playSdWav1.play(songs[serialData[0]-1]);
+    delay(20);
+    }
+    else
+    {
+      Candles();
     }
   }
-  Candles();
-  cleanSerialData();
+  else
+  {
+    while(playSdWav1.isPlaying() == true)
+    {
+      switch(serialData[1])
+      {
+        case 1:
+        flash.runFlashSequence(CRGB::White,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        break;
+      }
+    }
+    cleanSerialData();
+  }
 }
