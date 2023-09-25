@@ -62,6 +62,9 @@ class FlashSequence{
 };
 
 extern FlashSequence flash;
+extern MountainKingSequence mountainKing;
+
+#define FOG_PIN 4
 
 void sendSongs();
 

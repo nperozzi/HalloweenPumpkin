@@ -48,52 +48,47 @@ void sendSongs()
 void getSerialData()
 {
   int i = 0;
-  int value = 0;
-  while(Serial1.available())
+  int value[NUM_DATA_FIELDS] = {0,0,0,0};
+  while(Serial1.available() > 0)
   {
     char ch = Serial1.read();
-    switch(ch)
+    Serial.println(ch);
+    if( ch == '+')
     {
-      case '+':
-        vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
-        amp1.gain(vol);
-        Serial1.println(vol);
-        //Serial.println(vol);  //DEBUGGING LINE
-        break;
-      case '-':
-        vol = constrain(vol - VOL_CHANGE, VOL_MIN, VOL_MAX);
-        amp1.gain(vol);
-        Serial1.println(vol);
-        //Serial.println(vol); //DEBUGGING LINE
-        break;
-      case '*':
-        fogIsOn = !fogIsOn;
-        Serial.println(fogIsOn);
-        break;
+      vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
+      amp1.gain(vol);
+      Serial1.println(vol);
     }
-    if(ch >= '0' && ch <= '9')             //Add up the chars camming into the serial to build each element of the array
+    else if(ch == '-')
     {
-      value = (value * 10) + (ch - '0');
+      vol = constrain(vol - VOL_CHANGE, VOL_MIN, VOL_MAX);
+      amp1.gain(vol);
+      Serial1.println(vol);
     }
-    else if(ch == ',' && i < NUM_DATA_FIELDS)                  //If there is a "," it means that one emenet has ended and it is time to sart adding up the next elment
+    else if(ch == '*')
     {
-        serialData[i] = value;
-        value = 0;
+      fogIsOn = !fogIsOn;
+      digitalWrite(FOG_PIN, fogIsOn);
+      Serial.println(fogIsOn);
+    }
+    else if(ch >= '0' && ch <= '9')             //Add up the chars camming into the serial to build each element of the array
+    {
+      value[i] = (value[i] * 10) + (ch - '0');
+    }
+    else if(ch == ',' && i < NUM_DATA_FIELDS)
+    {
+        //Serial.println(serialData[i]);
         i++;
     }
     else if (ch == 'F')
     {
-      //SERIAL DEBUG
-      for(int j = 0; j < NUM_DATA_FIELDS; j++)
+      for (int j = 0; j < NUM_DATA_FIELDS; j++)
       {
-        Serial.print(serialData[j]);
-        if(j != NUM_DATA_FIELDS - 1)
-        {
-          Serial.print(',');
-        } 
+        serialData[j] = value[j];
+        Serial.print(serialData[j]); //SERIAL DEBUG
+        value[j] = 0;
       }
-      Serial.println();
-      //END SERIAL DEBUG
+      Serial.println(); //SERIAL DEBUG
     }
   }
 }

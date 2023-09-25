@@ -21,6 +21,8 @@ Version:
 #define SDCARD_MOSI_PIN 11
 #define SDCARD_SCK_PIN 13
 
+
+
 void setup()
 {
   //Bluetooth Serial setup
@@ -59,6 +61,8 @@ void setup()
 
   //Volume Setup:
   amp1.gain(vol);   //vol is a float. vol=0 is not sound. 0.0<vol<1.0 atenuation.
+
+  pinMode(FOG_PIN, OUTPUT);
 }
 
 void loop()
@@ -80,12 +84,31 @@ void loop()
   {
     while(playSdWav1.isPlaying() == true)
     {
+      getSerialData();
       switch(serialData[1])
       {
         case 1:
-        flash.runFlashSequence(CRGB::White,60);
-        fill_solid(Strip2, NUM_LED2, CRGB::Black);
-        break;
+          flash.runFlashSequence(CRGB::White,60);
+          fill_solid(Strip2, NUM_LED2, CRGB::Black);
+          break;
+        case 2:
+          flash.runFlashSequence(CRGB::Red,60);
+          fill_solid(Strip2, NUM_LED2, CRGB::Black);
+          break;
+        case 3:
+          flash.runFlashSequence(CRGB::Green,60);
+          fill_solid(Strip2, NUM_LED2, CRGB::Black);
+          break;
+        case 4:
+          flash.runFlashSequence(CRGB::Purple,60);
+          fill_solid(Strip2, NUM_LED2, CRGB::Black);
+          break;
+        case 5:
+          FlashMultiColor();
+          break;
+        case 6:
+          mountainKing.runMountainKingSequence(500);
+          break;
       }
     }
     cleanSerialData();
