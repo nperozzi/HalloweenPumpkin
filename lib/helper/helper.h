@@ -7,10 +7,11 @@
 #include <SPI.h>
 #include <SD.h>
 #include <FastLED.h>
+#include <PWMServo.h>
 
 //Variable Declarations
 extern float vol;
-#define VOL_CHANGE 0.2
+#define VOL_CHANGE 0.02
 #define VOL_MIN 0.0
 #define VOL_MAX 0.6
 
@@ -42,6 +43,7 @@ extern AudioConnection          patchCord2;
 //Bluetooth Elements:
 const int NUM_DATA_FIELDS = 4;
 extern  uint8_t serialData[NUM_DATA_FIELDS];
+extern uint8_t playingData[NUM_DATA_FIELDS];
 extern char stateFlag;
 
 //Classes:
@@ -65,15 +67,28 @@ extern FlashSequence flash;
 extern MountainKingSequence mountainKing;
 
 #define FOG_PIN 4
+#define EYEBALL_PIN 29
+#define EYELID_PIN 30
+
+extern PWMServo eyeBall;
+extern PWMServo eyeLid;
+/*
+int ballLeft = 47;
+int ballRight = 112;
+int lidOpen = 110;
+int lidClosed = 175;
+*/
 
 void sendSongs();
 
 void getSerialData();
 
-void cleanSerialData();
+void cleanPlayingData();
 
 void Candles();
 
 void FlashMultiColor();
+
+void move();
 
 #endif

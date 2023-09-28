@@ -5,7 +5,8 @@
 float vol = 0.02;
 CRGB Strip1[NUM_LED1];
 CRGB Strip2[NUM_LED2];
-uint8_t serialData[NUM_DATA_FIELDS] = {0, 0};
+uint8_t serialData[NUM_DATA_FIELDS] = {0, 0, 0, 0};
+uint8_t playingData[NUM_DATA_FIELDS] = {0, 0, 0, 0};
 
 // Audio Elements:
 // GUItool: begin automatically generated code
@@ -24,7 +25,10 @@ bool fogIsOn = false;
 
 //Create Objects for light sequences:
 FlashSequence flash = FlashSequence();
-MountainKingSequence mountainKing= MountainKingSequence();
+MountainKingSequence mountainKing = MountainKingSequence();
+
+PWMServo eyeBall = PWMServo();
+PWMServo eyeLid = PWMServo();
 
 void sendSongs()
 {
@@ -45,14 +49,14 @@ void sendSongs()
   }
 }
 
-void getSerialData()
+void getSerialData()  //TEST FUNCTION
 {
   int i = 0;
   int value[NUM_DATA_FIELDS] = {0,0,0,0};
   while(Serial1.available() > 0)
   {
     char ch = Serial1.read();
-    Serial.println(ch);
+    //Serial.println(ch);
     if( ch == '+')
     {
       vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
@@ -86,6 +90,7 @@ void getSerialData()
       {
         serialData[j] = value[j];
         Serial.print(serialData[j]); //SERIAL DEBUG
+        Serial.print(',');
         value[j] = 0;
       }
       Serial.println(); //SERIAL DEBUG
@@ -93,11 +98,63 @@ void getSerialData()
   }
 }
 
-void cleanSerialData()
+/* getSerialData()   //BACK UP FUNCTION 
+void getSerialData()   //BACK UP FUNCTION
 {
-  for(int i = 0; i < NUM_DATA_FIELDS; i++)
+  int i = 0;
+  int value[NUM_DATA_FIELDS] = {0,0,0,0};
+  while(Serial1.available() > 0)
   {
-    serialData[i] = 0; 
+    char ch = Serial1.read();
+    //Serial.println(ch);
+    if( ch == '+')
+    {
+      vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
+      amp1.gain(vol);
+      Serial1.println(vol);
+    }
+    else if(ch == '-')
+    {
+      vol = constrain(vol - VOL_CHANGE, VOL_MIN, VOL_MAX);
+      amp1.gain(vol);
+      Serial1.println(vol);
+    }
+    else if(ch == '*')
+    {
+      fogIsOn = !fogIsOn;
+      digitalWrite(FOG_PIN, fogIsOn);
+      Serial.println(fogIsOn);
+    }
+    else if(ch >= '0' && ch <= '9')             //Add up the chars camming into the serial to build each element of the array
+    {
+      value[i] = (value[i] * 10) + (ch - '0');
+    }
+    else if(ch == ',' && i < NUM_DATA_FIELDS)
+    {
+        //Serial.println(serialData[i]);
+        i++;
+    }
+    else if (ch == 'F')
+    {
+      for (int j = 0; j < NUM_DATA_FIELDS; j++)
+      {
+        serialData[j] = value[j];
+        Serial.print(serialData[j]); //SERIAL DEBUG
+        Serial.print(',');
+        value[j] = 0;
+      }
+      Serial.println(); //SERIAL DEBUG
+    }
+  }
+}
+*/
+
+void cleanPlayingData()
+{
+  for(int i = 0; i <= 2; i++)
+  {
+    playingData[i] = 0;
+
   }
 }
 
@@ -177,3 +234,8 @@ void FlashSequence::runFlashSequence(CRGB color, uint32_t eventFrequency)
   FastLED.show();  
 }
 
+void move()
+{
+  eyeBall.write(serialData[2]);
+  eyeLid.write(serialData[3]);
+}

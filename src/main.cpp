@@ -63,6 +63,11 @@ void setup()
   amp1.gain(vol);   //vol is a float. vol=0 is not sound. 0.0<vol<1.0 atenuation.
 
   pinMode(FOG_PIN, OUTPUT);
+  pinMode(EYEBALL_PIN, OUTPUT);
+  pinMode(EYELID_PIN, OUTPUT);
+
+  eyeBall.attach(EYEBALL_PIN);  //1000, 2000)
+  eyeLid.attach(EYELID_PIN);
 }
 
 void loop()
@@ -70,10 +75,17 @@ void loop()
   if(playSdWav1.isPlaying() != true)
   {
     getSerialData();
-    if(serialData[0] != 0)
+    move();
+    eyeBall.write(serialData[2]);
+    eyeLid.write(serialData[3]);
+    if(serialData[0] != 0 && serialData[0] <= songs_count)
     {
-    playSdWav1.play(songs[serialData[0]-1]);
-    delay(20);
+      for (int i = 0 ; i <= 2; i++)
+      {
+        playingData[i] = serialData[i];
+      }
+      playSdWav1.play(songs[playingData[0]-1]);
+      delay(20);
     }
     else
     {
@@ -84,8 +96,7 @@ void loop()
   {
     while(playSdWav1.isPlaying() == true)
     {
-      getSerialData();
-      switch(serialData[1])
+      switch(playingData[1])
       {
         case 1:
           flash.runFlashSequence(CRGB::White,60);
@@ -111,6 +122,6 @@ void loop()
           break;
       }
     }
-    cleanSerialData();
+    cleanPlayingData();
   }
 }
