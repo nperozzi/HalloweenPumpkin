@@ -21,8 +21,6 @@ Version:
 #define SDCARD_MOSI_PIN 11
 #define SDCARD_SCK_PIN 13
 
-
-
 void setup()
 {
   //Bluetooth Serial setup
@@ -44,27 +42,17 @@ void setup()
   SPI.setSCK(SDCARD_SCK_PIN);
   SD.begin(BUILTIN_SD_CARD);
 
-  //Save list of songs
-  File root = SD.open("/");
-  if (root)
-  {
-    while(File file = root.openNextFile())
-    {
-      strcpy(songs[songs_count], file.name());
-      songs_count++;
-      file.close();
-    }
-    root.close();
-  }
-
+  //Save and send list of songs
+  saveSongs();
   sendSongs();
 
   //Volume Setup:
+  attachInterrupt(digitalPinToInterrupt(0),getSerialData,CHANGE);
   amp1.gain(vol);   //vol is a float. vol=0 is not sound. 0.0<vol<1.0 atenuation.
 
   pinMode(FOG_PIN, OUTPUT);
   pinMode(EYEBALL_PIN, OUTPUT);
-  pinMode(EYELID_PIN, OUTPUT);
+  pinMode(EYELID_PIN, OUTPUT);  
 
   eyeBall.attach(EYEBALL_PIN);  //1000, 2000)
   eyeLid.attach(EYELID_PIN);
@@ -74,16 +62,19 @@ void loop()
 {
   if(playSdWav1.isPlaying() != true)
   {
-    getSerialData();
-    move();
+    //move servos
     eyeBall.write(serialData[2]);
     eyeLid.write(serialData[3]);
+
+    //Test to play song
     if(serialData[0] != 0 && serialData[0] <= songs_count)
     {
+      //Save playing values
       for (int i = 0 ; i <= 2; i++)
       {
         playingData[i] = serialData[i];
       }
+      
       playSdWav1.play(songs[playingData[0]-1]);
       delay(20);
     }
@@ -94,6 +85,7 @@ void loop()
   }
   else
   {
+    //While playing song, play lights:
     while(playSdWav1.isPlaying() == true)
     {
       switch(playingData[1])

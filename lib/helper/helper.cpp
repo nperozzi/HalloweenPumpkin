@@ -30,6 +30,21 @@ MountainKingSequence mountainKing = MountainKingSequence();
 PWMServo eyeBall = PWMServo();
 PWMServo eyeLid = PWMServo();
 
+void saveSongs()
+{
+  File root = SD.open("/");
+  if (root)
+  {
+    while(File file = root.openNextFile())
+    {
+      strcpy(songs[songs_count], file.name());
+      songs_count++;
+      file.close();
+    }
+    root.close();
+  }
+}
+
 void sendSongs()
 {
   while(Serial1.available() == 0)
@@ -56,7 +71,6 @@ void getSerialData()  //TEST FUNCTION
   while(Serial1.available() > 0)
   {
     char ch = Serial1.read();
-    //Serial.println(ch);
     if( ch == '+')
     {
       vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
@@ -81,7 +95,6 @@ void getSerialData()  //TEST FUNCTION
     }
     else if(ch == ',' && i < NUM_DATA_FIELDS)
     {
-        //Serial.println(serialData[i]);
         i++;
     }
     else if (ch == 'F')
@@ -90,64 +103,13 @@ void getSerialData()  //TEST FUNCTION
       {
         serialData[j] = value[j];
         Serial.print(serialData[j]); //SERIAL DEBUG
-        Serial.print(',');
+        Serial.print(','); //SERIAL DEBUG
         value[j] = 0;
       }
       Serial.println(); //SERIAL DEBUG
     }
   }
 }
-
-/* getSerialData()   //BACK UP FUNCTION 
-void getSerialData()   //BACK UP FUNCTION
-{
-  int i = 0;
-  int value[NUM_DATA_FIELDS] = {0,0,0,0};
-  while(Serial1.available() > 0)
-  {
-    char ch = Serial1.read();
-    //Serial.println(ch);
-    if( ch == '+')
-    {
-      vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
-      amp1.gain(vol);
-      Serial1.println(vol);
-    }
-    else if(ch == '-')
-    {
-      vol = constrain(vol - VOL_CHANGE, VOL_MIN, VOL_MAX);
-      amp1.gain(vol);
-      Serial1.println(vol);
-    }
-    else if(ch == '*')
-    {
-      fogIsOn = !fogIsOn;
-      digitalWrite(FOG_PIN, fogIsOn);
-      Serial.println(fogIsOn);
-    }
-    else if(ch >= '0' && ch <= '9')             //Add up the chars camming into the serial to build each element of the array
-    {
-      value[i] = (value[i] * 10) + (ch - '0');
-    }
-    else if(ch == ',' && i < NUM_DATA_FIELDS)
-    {
-        //Serial.println(serialData[i]);
-        i++;
-    }
-    else if (ch == 'F')
-    {
-      for (int j = 0; j < NUM_DATA_FIELDS; j++)
-      {
-        serialData[j] = value[j];
-        Serial.print(serialData[j]); //SERIAL DEBUG
-        Serial.print(',');
-        value[j] = 0;
-      }
-      Serial.println(); //SERIAL DEBUG
-    }
-  }
-}
-*/
 
 void cleanPlayingData()
 {

@@ -79,6 +79,7 @@ int lidOpen = 110;
 int lidClosed = 175;
 */
 
+void saveSongs();
 void sendSongs();
 
 void getSerialData();
