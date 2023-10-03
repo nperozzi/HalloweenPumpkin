@@ -27,6 +27,7 @@ void setup()
   Serial1.begin(9600);  //Defining communication rate with the HC-06 bluetooth module. Boud rate is 9600
   Serial.begin(9600);   //SERIAL FOR DEBUGGING
   
+  
   //Audio setup:
   AudioMemory(8);
 
@@ -47,19 +48,20 @@ void setup()
   sendSongs();
 
   //Volume Setup:
-  attachInterrupt(digitalPinToInterrupt(0),getSerialData,CHANGE);
+  //attachInterrupt(digitalPinToInterrupt(0),getSerialData,CHANGE);
   amp1.gain(vol);   //vol is a float. vol=0 is not sound. 0.0<vol<1.0 atenuation.
 
-  pinMode(FOG_PIN, OUTPUT);
+  //Setup eye
   pinMode(EYEBALL_PIN, OUTPUT);
   pinMode(EYELID_PIN, OUTPUT);  
-
-  eyeBall.attach(EYEBALL_PIN);  //1000, 2000)
+  eyeBall.attach(EYEBALL_PIN);  //TODO: I am not defining the PWM range, do I have to? 1000, 2000ms
   eyeLid.attach(EYELID_PIN);
 }
 
 void loop()
 {
+  getSerialData();
+  volume();
   if(playSdWav1.isPlaying() != true)
   {
     //move servos
@@ -67,14 +69,13 @@ void loop()
     eyeLid.write(serialData[3]);
 
     //Test to play song
-    if(serialData[0] != 0 && serialData[0] <= songs_count)
+    if(serialData[0] != 0 && serialData[0] <= songs_count)   //TODO: If the serialData would be reliable, I do not need to check for song count
     {
-      //Save playing values
+      //Save playing values and play
       for (int i = 0 ; i <= 2; i++)
       {
         playingData[i] = serialData[i];
       }
-      
       playSdWav1.play(songs[playingData[0]-1]);
       delay(20);
     }

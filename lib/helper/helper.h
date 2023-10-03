@@ -9,12 +9,13 @@
 #include <FastLED.h>
 #include <PWMServo.h>
 
-//Variable Declarations
+//Volume variables declarations
 extern float vol;
 #define VOL_CHANGE 0.02
 #define VOL_MIN 0.0
 #define VOL_MAX 0.6
 
+//Songs variables declarations
 #define MAX_NUM_SONGS 255
 #define MAX_SONGS_TITLE_LENGTH 30
 extern int songs_count;
@@ -31,6 +32,18 @@ extern CRGB Strip1[NUM_LED1];
 #define NUM_LED2 3
 extern CRGB Strip2[NUM_LED2];
 
+//Eye variables declarations:
+#define EYEBALL_PIN 29
+#define EYELID_PIN 30
+extern PWMServo eyeBall;
+extern PWMServo eyeLid;
+/*
+int ballLeft = 47;
+int ballRight = 112;
+int lidOpen = 110;
+int lidClosed = 175;
+*/
+
 // Audio Elements:
 // GUItool: begin automatically generated code
 extern AudioPlaySdWav           playSdWav1;
@@ -41,7 +54,7 @@ extern AudioConnection          patchCord2;
 // GUItool: end automatically generated code
 
 //Bluetooth Elements:
-const int NUM_DATA_FIELDS = 4;
+const int NUM_DATA_FIELDS = 6;
 extern  uint8_t serialData[NUM_DATA_FIELDS];
 extern uint8_t playingData[NUM_DATA_FIELDS];
 extern char stateFlag;
@@ -66,30 +79,13 @@ class FlashSequence{
 extern FlashSequence flash;
 extern MountainKingSequence mountainKing;
 
-#define FOG_PIN 4
-#define EYEBALL_PIN 29
-#define EYELID_PIN 30
-
-extern PWMServo eyeBall;
-extern PWMServo eyeLid;
-/*
-int ballLeft = 47;
-int ballRight = 112;
-int lidOpen = 110;
-int lidClosed = 175;
-*/
-
 void saveSongs();
 void sendSongs();
-
 void getSerialData();
-
+void volume();
 void cleanPlayingData();
-
 void Candles();
-
 void FlashMultiColor();
-
 void move();
 
 #endif

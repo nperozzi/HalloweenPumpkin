@@ -1,12 +1,15 @@
 #include "makeColor.h"
 #include "helper.h"
 
-//Variable Definitions and Initialization
+
+char stateFlag = 'N';
 float vol = 0.02;
-CRGB Strip1[NUM_LED1];
-CRGB Strip2[NUM_LED2];
-uint8_t serialData[NUM_DATA_FIELDS] = {0, 0, 0, 0};
-uint8_t playingData[NUM_DATA_FIELDS] = {0, 0, 0, 0};
+
+//Variable Definitions and Initialization
+
+//Serial data initialization:
+uint8_t serialData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
+uint8_t playingData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
 
 // Audio Elements:
 // GUItool: begin automatically generated code
@@ -17,16 +20,18 @@ AudioConnection          patchCord1(playSdWav1, 0, amp1, 0);
 AudioConnection          patchCord2(amp1, dac1);
 // GUItool: end automatically generated code
 
+//Songs initialization
+CRGB Strip1[NUM_LED1];
+CRGB Strip2[NUM_LED2];
 int songs_count = 0;
 char songs[MAX_NUM_SONGS][MAX_SONGS_TITLE_LENGTH];
 
-char stateFlag = 'N';
-bool fogIsOn = false;
 
-//Create Objects for light sequences:
+//Lights initialization:
 FlashSequence flash = FlashSequence();
 MountainKingSequence mountainKing = MountainKingSequence();
 
+//Eye initialization
 PWMServo eyeBall = PWMServo();
 PWMServo eyeLid = PWMServo();
 
@@ -64,34 +69,14 @@ void sendSongs()
   }
 }
 
-
-
-void getSerialData()  //TEST FUNCTION
+void getSerialData()
 {
   int i = 0;
-  int value[NUM_DATA_FIELDS] = {0,0,0,0};
+  int value[NUM_DATA_FIELDS] = {0,0,0,0,0,0};
   while(Serial1.available() > 0)
   {
     char ch = Serial1.read();
-    if( ch == '+')
-    {
-      vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
-      amp1.gain(vol);
-      Serial1.println(vol);
-    }
-    else if(ch == '-')
-    {
-      vol = constrain(vol - VOL_CHANGE, VOL_MIN, VOL_MAX);
-      amp1.gain(vol);
-      Serial1.println(vol);
-    }
-    else if(ch == '*')
-    {
-      fogIsOn = !fogIsOn;
-      digitalWrite(FOG_PIN, fogIsOn);
-      Serial.println(fogIsOn);
-    }
-    else if(ch >= '0' && ch <= '9')             //Add up the chars camming into the serial to build each element of the array
+    if(ch >= '0' && ch <= '9')             //Add up the chars camming into the serial to build each element of the array
     {
       value[i] = (value[i] * 10) + (ch - '0');
     }
@@ -99,7 +84,7 @@ void getSerialData()  //TEST FUNCTION
     {
         i++;
     }
-    else if (ch == 'F')
+    else if (ch == '\n')
     {
       for (int j = 0; j < NUM_DATA_FIELDS; j++)
       {
@@ -110,6 +95,25 @@ void getSerialData()  //TEST FUNCTION
       }
       Serial.println(); //SERIAL DEBUG
     }
+  }
+}
+
+void volume()
+{
+  if(serialData[4] == 1)
+  {
+    vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
+    amp1.gain(vol);
+    serialData[4] = 0;
+    Serial1.println(vol);
+    
+  }
+  else if(serialData[5] == 1)
+  {
+    vol = constrain(vol - VOL_CHANGE, VOL_MIN, VOL_MAX);
+    amp1.gain(vol);
+    serialData[5] = 0;
+    Serial1.println(vol);
   }
 }
 
