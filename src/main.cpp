@@ -75,6 +75,7 @@ void loop()
       for (int i = 0 ; i <= 2; i++)
       {
         playingData[i] = serialData[i];
+        serialData[i] = 0;
       }
       playSdWav1.play(songs[playingData[0]-1]);
       delay(20);
@@ -84,37 +85,39 @@ void loop()
       Candles();
     }
   }
-  else
+  //While playing song, play lights:
+  if(playSdWav1.isPlaying() == true)
   {
-    //While playing song, play lights:
-    while(playSdWav1.isPlaying() == true)
+    //move servos
+    eyeBall.write(serialData[2]);
+    eyeLid.write(serialData[3]);
+    
+    switch(playingData[1])
     {
-      switch(playingData[1])
-      {
-        case 1:
-          flash.runFlashSequence(CRGB::White,60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-          break;
-        case 2:
-          flash.runFlashSequence(CRGB::Red,60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-          break;
-        case 3:
-          flash.runFlashSequence(CRGB::Green,60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-          break;
-        case 4:
-          flash.runFlashSequence(CRGB::Purple,60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-          break;
-        case 5:
-          FlashMultiColor();
-          break;
-        case 6:
-          mountainKing.runMountainKingSequence(500);
-          break;
-      }
+      case 1:
+        flash.runFlashSequence(CRGB::White,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        break;
+      case 2:
+        flash.runFlashSequence(CRGB::Red,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        break;
+      case 3:
+        flash.runFlashSequence(CRGB::Green,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        break;
+      case 4:
+        flash.runFlashSequence(CRGB::Purple,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        break;
+      case 5:
+        FlashMultiColor();
+        break;
+      case 6:
+        mountainKing.runMountainKingSequence(500);
+        break;
     }
-    cleanPlayingData();
   }
+  delay(20);
+  //cleanPlayingData();
 }

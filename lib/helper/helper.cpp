@@ -76,7 +76,7 @@ void getSerialData()
   while(Serial1.available() > 0)
   {
     char ch = Serial1.read();
-    //Serial.print(ch);
+    Serial.print(ch);
     if(ch >= '0' && ch <= '9')             //Add up the chars camming into the serial to build each element of the array
     {
       value[i] = (value[i] * 10) + (ch - '0');
@@ -87,17 +87,17 @@ void getSerialData()
     }
     else if (ch == '\n')
     {
-      Serial.println(i);
+      //Serial.println(i);
       if(i == NUM_DATA_FIELDS - 1)
       { 
         for (int j = 0; j < NUM_DATA_FIELDS; j++)
         {
           serialData[j] = value[j];
-          Serial.print(serialData[j]); //SERIAL DEBUG
-          Serial.print(','); //SERIAL DEBUG
+          //Serial.print(serialData[j]); //SERIAL DEBUG
+          //Serial.print(','); //SERIAL DEBUG
           value[j] = 0;
         }
-        Serial.println(); //SERIAL DEBUG
+        //Serial.println(); //SERIAL DEBUG
       }
       else
       {
