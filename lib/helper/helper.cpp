@@ -111,18 +111,29 @@ void getSerialData()
 }
 
 bool readSerialData(SerialData &data) {
-  static String serialBuffer = "";
+  static char serialBuffer[15]; //QUESTION: why buffer 15bytes?
+  static unsigned int bufferIndex = 0;
   char endMarker = '\n';
 
-  while (Serial1.available()) {
+  while (Serial1.available()) 
+  {
     char receivedChar = Serial1.read();
-
-    if (receivedChar != endMarker) {
-      serialBuffer += receivedChar;
+    if (receivedChar != endMarker) 
+    {
+      if (bufferIndex < sizeof(serialBuffer) - 1) 
+      {
+        serialBuffer[bufferIndex++] = receivedChar;
+      } else {
+        // Buffer overflow, clear the buffer
+        bufferIndex = 0;
+      }
     } 
     else {
-      int result = sscanf(serialBuffer.c_str(), "%d,%d,%d,%d,%d,%d", &data.song, &data.light, &data.eyeball, &data.eyelid, &data.vol_up, &data.vol_down);
-      serialBuffer = "";
+      // Null-terminate the buffer
+      serialBuffer[bufferIndex] = '\0';  //QUESTION: why do we need to add the '\0' char to the buffer?
+
+      int result = sscanf(serialBuffer, "%d,%d,%d,%d,%d,%d", &data.song, &data.light, &data.eyeball, &data.eyelid, &data.vol_up, &data.vol_down);
+      bufferIndex = 0; // Reset buffer index
 
       if (result == 6) {
         Serial.print(data.song);Serial.print(", ");
