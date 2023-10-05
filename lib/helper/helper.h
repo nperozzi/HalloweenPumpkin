@@ -91,12 +91,13 @@ extern MountainKingSequence mountainKing;
 
 void saveSongs();
 void sendSongs();
-void getSerialData();
 bool readSerialData(SerialData &data);
-void volume();
+void lights(int value);
+void volume(SerialData &data);
+void move(SerialData &data);
 void cleanPlayingData();
 void Candles();
 void FlashMultiColor();
-void move();
+
 
 #endif

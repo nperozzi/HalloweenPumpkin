@@ -72,44 +72,6 @@ void sendSongs()
   }
 }
 
-void getSerialData()
-{
-  int i = 0;
-  int value[NUM_DATA_FIELDS] = {0,0,0,0,0,0};
-  while(Serial1.available() > 0)
-  {
-    char ch = Serial1.read();
-    Serial.print(ch);
-    if(ch >= '0' && ch <= '9')             //Add up the chars camming into the serial to build each element of the array
-    {
-      value[i] = (value[i] * 10) + (ch - '0');
-    }
-    else if(ch == ',' && i < NUM_DATA_FIELDS)
-    {
-        i++;
-    }
-    else if (ch == '\n')
-    {
-      //Serial.println(i);
-      if(i == NUM_DATA_FIELDS - 1)
-      { 
-        for (int j = 0; j < NUM_DATA_FIELDS; j++)
-        {
-          serialData[j] = value[j];
-          //Serial.print(serialData[j]); //SERIAL DEBUG
-          //Serial.print(','); //SERIAL DEBUG
-          value[j] = 0;
-        }
-        //Serial.println(); //SERIAL DEBUG
-      }
-      else
-      {
-        Serial.println("Data descarted");
-      }
-    }
-  }
-}
-
 bool readSerialData(SerialData &data) {
   static char serialBuffer[15]; //QUESTION: why buffer 15bytes?
   static unsigned int bufferIndex = 0;
@@ -152,23 +114,62 @@ bool readSerialData(SerialData &data) {
   return false;
 }
 
-void volume()
+void lights(int value)
 {
-  if(serialData[4] == 1)
+  if(playSdWav1.isPlaying() == true)
+  {
+    switch(value)
+    {
+      case 1:
+        flash.runFlashSequence(CRGB::White,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        break;
+      case 2:
+        flash.runFlashSequence(CRGB::Red,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        break;
+      case 3:
+        flash.runFlashSequence(CRGB::Green,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        break;
+      case 4:
+        flash.runFlashSequence(CRGB::Purple,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        break;
+      case 5:
+        FlashMultiColor();
+        break;
+      case 6:
+        mountainKing.runMountainKingSequence(500);
+        break;
+    }
+  }
+  else
+  {
+    Candles();
+  }
+}
+
+void volume(SerialData &data)
+{
+  if(data.vol_up == 1)
   {
     vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
     amp1.gain(vol);
-    serialData[4] = 0;
     Serial1.println(vol);
-    
   }
-  else if(serialData[5] == 1)
+  else if(data.vol_down == 1)
   {
     vol = constrain(vol - VOL_CHANGE, VOL_MIN, VOL_MAX);
     amp1.gain(vol);
-    serialData[5] = 0;
     Serial1.println(vol);
   }
+}
+
+void move(SerialData &data)
+{
+  eyeBall.write(data.eyeball);
+  eyeLid.write(data.eyeball);
 }
 
 void cleanPlayingData()
@@ -256,8 +257,3 @@ void FlashSequence::runFlashSequence(CRGB color, uint32_t eventFrequency)
   FastLED.show();  
 }
 
-void move()
-{
-  eyeBall.write(serialData[2]);
-  eyeLid.write(serialData[3]);
-}

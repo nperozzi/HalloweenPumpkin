@@ -22,6 +22,7 @@ Version:
 #define SDCARD_SCK_PIN 13
 
 SerialData myData;
+int savedLight = 0;
 
 void setup()
 {
@@ -64,69 +65,35 @@ void loop()
 {
   if( readSerialData(myData) == true)
   {
-
+    //Eye
+    move(myData);
     
-    volume();
-    if(playSdWav1.isPlaying() != true)
-    {
-      //move servos
-      eyeBall.write(serialData[2]);
-      eyeLid.write(serialData[3]);
+    //Volume
+    volume(myData);
 
-      //Test to play song
-      if(serialData[0] != 0 && serialData[0] <= songs_count)   //TODO: If the serialData would be reliable, I do not need to check for song count
+    //Light
+    lights(savedLight);
+
+    //Song
+    if(myData.song != 0)
+    {
+      if(playSdWav1.isPlaying() == false)
       {
-        //Save playing values and play
-        for (int i = 0 ; i <= 2; i++)
-        {
-          playingData[i] = serialData[i];
-          serialData[i] = 0;
-        }
-        playSdWav1.play(songs[playingData[0]-1]);
-        //delay(20);
+        savedLight = myData.light;
+        playSdWav1.play(songs[myData.song-1]);
       }
       else
       {
-        Candles();
+        return;
       }
     }
-    //While playing song, play lights:
-    if(playSdWav1.isPlaying() == true)
+    else
     {
-      //move servos
-      eyeBall.write(serialData[2]);
-      eyeLid.write(serialData[3]);
-      
-      switch(playingData[1])
-      {
-        case 1:
-          flash.runFlashSequence(CRGB::White,60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-          break;
-        case 2:
-          flash.runFlashSequence(CRGB::Red,60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-          break;
-        case 3:
-          flash.runFlashSequence(CRGB::Green,60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-          break;
-        case 4:
-          flash.runFlashSequence(CRGB::Purple,60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-          break;
-        case 5:
-          FlashMultiColor();
-          break;
-        case 6:
-          mountainKing.runMountainKingSequence(500);
-          break;
-      }
+      return;
     }
-    //delay(20);
-    //cleanPlayingData();
   }
-  else{
-    Candles();
+  else
+  {
+    lights(savedLight);
   }
 }
