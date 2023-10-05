@@ -11,6 +11,8 @@ float vol = 0.02;
 uint8_t serialData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
 uint8_t playingData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
 
+
+
 // Audio Elements:
 // GUItool: begin automatically generated code
 AudioPlaySdWav           playSdWav1;
@@ -25,6 +27,7 @@ CRGB Strip1[NUM_LED1];
 CRGB Strip2[NUM_LED2];
 int songs_count = 0;
 char songs[MAX_NUM_SONGS][MAX_SONGS_TITLE_LENGTH];
+
 
 
 //Lights initialization:
@@ -105,6 +108,37 @@ void getSerialData()
       }
     }
   }
+}
+
+bool readSerialData(SerialData &data) {
+  static String serialBuffer = "";
+  char endMarker = '\n';
+
+  while (Serial1.available()) {
+    char receivedChar = Serial1.read();
+
+    if (receivedChar != endMarker) {
+      serialBuffer += receivedChar;
+    } 
+    else {
+      int result = sscanf(serialBuffer.c_str(), "%d,%d,%d,%d,%d,%d", &data.song, &data.light, &data.eyeball, &data.eyelid, &data.vol_up, &data.vol_down);
+      serialBuffer = "";
+
+      if (result == 6) {
+        Serial.print(data.song);Serial.print(", ");
+        Serial.print(data.light);Serial.print(", ");
+        Serial.print(data.eyeball);Serial.print(", ");
+        Serial.print(data.eyelid);Serial.print(", ");
+        Serial.print(data.vol_up);Serial.print(", ");
+        Serial.println(data.vol_down);
+        return true;
+      } 
+      else {
+        return false;
+      }
+    }
+  }
+  return false;
 }
 
 void volume()

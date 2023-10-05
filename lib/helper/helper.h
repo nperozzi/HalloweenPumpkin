@@ -57,6 +57,16 @@ extern AudioConnection          patchCord2;
 const int NUM_DATA_FIELDS = 6;
 extern  uint8_t serialData[NUM_DATA_FIELDS];
 extern uint8_t playingData[NUM_DATA_FIELDS];
+struct SerialData {
+  int song;
+  int light;
+  int eyeball;
+  int eyelid;
+  int vol_up;
+  int vol_down;
+};
+
+
 extern char stateFlag;
 
 //Classes:
@@ -82,6 +92,7 @@ extern MountainKingSequence mountainKing;
 void saveSongs();
 void sendSongs();
 void getSerialData();
+bool readSerialData(SerialData &data);
 void volume();
 void cleanPlayingData();
 void Candles();
