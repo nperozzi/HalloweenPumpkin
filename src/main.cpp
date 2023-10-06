@@ -1,4 +1,4 @@
-/* TEST TEXT
+/*
 HalloweenPumpkinV3
 Decription:
   A HalloweenPumpkin that reproduces "tracks" (sound and a light sequence) when triggered via bluetooth.
@@ -38,8 +38,7 @@ void setup()
   FastLED.addLeds<WS2812, LED1_PIN, RGB> (Strip1, NUM_LED1); //Candles Strip setup
   FastLED.addLeds<WS2812, LED2_PIN, RGB> (Strip2, NUM_LED2); //MiniPumpkins Strip setup
   FastLED.setBrightness(50);
-  fill_solid(Strip1, NUM_LED1, CRGB::Black);  //TODO: light do not start att off.
-  fill_solid(Strip2, NUM_LED2, CRGB::Black);
+  FastLED.clear();
 
   //SD Card setup:
   SPI.setMOSI(SDCARD_MOSI_PIN);
