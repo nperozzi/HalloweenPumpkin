@@ -34,6 +34,8 @@ char songs[MAX_NUM_SONGS][MAX_SONGS_TITLE_LENGTH];
 FlashSequence flash = FlashSequence();
 MountainKingSequence mountainKing = MountainKingSequence();
 
+
+
 //Eye initialization
 PWMServo eyeBall = PWMServo();
 PWMServo eyeLid = PWMServo();
@@ -129,15 +131,14 @@ void lights(int value)
         fill_solid(Strip2, NUM_LED2, CRGB::Black);
         break;
       case 3:
-        flash.runFlashSequence(CRGB::Green,60);
-        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        rainbow(5000);
         break;
       case 4:
         flash.runFlashSequence(CRGB::Purple,60);
         fill_solid(Strip2, NUM_LED2, CRGB::Black);
         break;
       case 5:
-        FlashMultiColor();
+        flashThreeColors(CRGB::DarkRed, CRGB::DarkSalmon, CRGB::DarkSeaGreen, 250);
         break;
       case 6:
         mountainKing.runMountainKingSequence(500);
@@ -201,6 +202,7 @@ void Candles(){
   }
 }
 
+/*
 void FlashMultiColor()
 {
   #define RED    0xFF0000
@@ -224,6 +226,72 @@ void FlashMultiColor()
       }
       delay(tempo);
     }
+  }
+}
+*/
+
+void flashThreeColors(CRGB color0, CRGB color1, CRGB color2, uint16_t frequency)
+{
+  static uint32_t prevMillis = 0;
+  static uint8_t colorIndex = 0;
+  static bool isColor = false;
+  unsigned long currentMillis = millis();
+  
+  if (currentMillis - prevMillis >= frequency)
+  {
+    prevMillis = currentMillis;
+
+    if(isColor)
+    {
+      fill_solid(Strip1, NUM_LED1, CRGB::Black);
+    }
+    else
+    {
+      switch(colorIndex)
+      {
+        case 0:
+          fill_solid(Strip1, NUM_LED1, color0);
+          fill_solid(Strip2, NUM_LED2, color0);
+          break;
+        case 1:
+          fill_solid(Strip1, NUM_LED1, color1);
+          fill_solid(Strip2, NUM_LED2, color1);
+          break;
+        case 2:
+          fill_solid(Strip1, NUM_LED1, color2);
+          fill_solid(Strip2, NUM_LED2, color2);
+          break;
+      }
+    }
+    FastLED.show();
+    isColor = !isColor;
+    if(isColor == false)
+    {
+      colorIndex = (colorIndex + 1) % 3;
+    }
+
+  }
+}
+
+void rainbow(uint16_t rainbowCycleTime)
+{
+  static uint32_t prevMillis = 0;
+  static uint8_t colorIndex = 0;
+  unsigned long currentMillis = millis();
+  if (currentMillis - prevMillis >= rainbowCycleTime / 256)
+  {
+    prevMillis = currentMillis;
+
+    for (int i = 0; i < NUM_LED1; i++)
+    {
+      Strip1[i] = CHSV(colorIndex + (i * 256/NUM_LED1), 255, 255);
+    }
+    FastLED.show();
+    colorIndex++;
+    if(colorIndex > 255)
+    {
+      colorIndex = 0;
+    }  
   }
 }
 

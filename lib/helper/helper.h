@@ -97,7 +97,9 @@ void volume(SerialData &data);
 void move(SerialData &data);
 void cleanPlayingData();
 void Candles();
-void FlashMultiColor();
+//void FlashMultiColor();
+void flashThreeColors(CRGB color0, CRGB color1, CRGB color2, uint16_t frequency);
+void rainbow(uint16_t rainbowCycleTime);
 
 
 #endif
