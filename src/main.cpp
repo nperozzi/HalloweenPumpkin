@@ -58,6 +58,10 @@ void setup()
   pinMode(EYELID_PIN, OUTPUT);  
   eyeBall.attach(EYEBALL_PIN);  //TODO: I am not defining the PWM range, do I have to? 1000, 2000ms
   eyeLid.attach(EYELID_PIN);
+  eyeBall.write(ballLeft);
+  eyeLid.write(lidClosed);
+  //eyeBall.detach();
+  //eyeLid.detach();
 }
 
 void loop()
@@ -65,7 +69,11 @@ void loop()
   if( readSerialData(myData) == true)
   {
     //Eye
-    move(myData);
+
+    if (myData.eyeball != 0)
+    {
+      smoothEye(myData.eyeball, 0.1);
+    }
     
     //Volume
     volume(myData);

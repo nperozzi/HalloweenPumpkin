@@ -7,11 +7,11 @@
 #include <SPI.h>
 #include <SD.h>
 #include <FastLED.h>
-#include <PWMServo.h>
+#include <Servo.h>
 
 //Volume variables declarations
 extern float vol;
-#define VOL_CHANGE 0.02
+#define VOL_CHANGE 0.06
 #define VOL_MIN 0.0
 #define VOL_MAX 0.6
 
@@ -33,16 +33,15 @@ extern CRGB Strip1[NUM_LED1];
 extern CRGB Strip2[NUM_LED2];
 
 //Eye variables declarations:
-#define EYEBALL_PIN 29
-#define EYELID_PIN 30
-extern PWMServo eyeBall;
-extern PWMServo eyeLid;
-/*
-int ballLeft = 47;
-int ballRight = 112;
-int lidOpen = 110;
-int lidClosed = 175;
-*/
+#define EYEBALL_PIN 11
+#define EYELID_PIN 12
+extern Servo eyeBall;
+extern Servo eyeLid;
+extern int ballLeft;
+extern int ballRight;
+extern int lidOpen;
+extern int lidClosed;
+
 
 // Audio Elements:
 // GUItool: begin automatically generated code
@@ -94,6 +93,7 @@ void sendSongs();
 bool readSerialData(SerialData &data);
 void lights(int value);
 void volume(SerialData &data);
+void smoothEye(int targetPosEyeBall, float moveRate);
 void move(SerialData &data);
 void cleanPlayingData();
 void Candles();
