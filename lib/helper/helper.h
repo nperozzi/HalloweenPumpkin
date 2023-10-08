@@ -7,7 +7,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <FastLED.h>
-#include <Servo.h>
+#include <PWMServo.h>
 
 //Volume variables declarations
 extern float vol;
@@ -33,10 +33,10 @@ extern CRGB Strip1[NUM_LED1];
 extern CRGB Strip2[NUM_LED2];
 
 //Eye variables declarations:
-#define EYEBALL_PIN 11
-#define EYELID_PIN 12
-extern Servo eyeBall;
-extern Servo eyeLid;
+#define EYEBALL_PIN 29
+#define EYELID_PIN 30
+extern PWMServo eyeBall;
+extern PWMServo eyeLid;
 extern int ballLeft;
 extern int ballRight;
 extern int lidOpen;
@@ -93,8 +93,8 @@ void sendSongs();
 bool readSerialData(SerialData &data);
 void lights(int value);
 void volume(SerialData &data);
-void smoothEye(int targetPosEyeBall, float moveRate);
-void move(SerialData &data);
+bool smothEyeLid(SerialData &data, float moveRate);
+void smoothEyeBall(SerialData &data, float moveRate);
 void cleanPlayingData();
 void Candles();
 void flashThreeColors(CRGB color0, CRGB color1, CRGB color2, uint16_t frequency);

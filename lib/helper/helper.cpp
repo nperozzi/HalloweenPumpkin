@@ -37,12 +37,12 @@ MountainKingSequence mountainKing = MountainKingSequence();
 
 
 //Eye initialization
-Servo eyeBall = Servo();
-Servo eyeLid = Servo();
+PWMServo eyeBall = PWMServo();
+PWMServo eyeLid = PWMServo();
 int ballLeft = 47;
 int ballRight = 112;
 int lidOpen = 110;
-int lidClosed = 175;
+int lidClosed = 170;
 
 
 void saveSongs()
@@ -105,12 +105,12 @@ bool readSerialData(SerialData &data) {
       bufferIndex = 0; // Reset buffer index
 
       if (result == 6) {
-        //Serial.print(data.song);Serial.print(", ");
-        //Serial.print(data.light);Serial.print(", ");
-        //Serial.print(data.eyeball);Serial.print(", ");
-        //Serial.print(data.eyelid);Serial.print(", ");
-        //Serial.print(data.vol_up);Serial.print(", ");
-        //Serial.println(data.vol_down);
+        Serial.print(data.song);Serial.print(", ");
+        Serial.print(data.light);Serial.print(", ");
+        Serial.print(data.eyeball);Serial.print(", ");
+        Serial.print(data.eyelid);Serial.print(", ");
+        Serial.print(data.vol_up);Serial.print(", ");
+        Serial.println(data.vol_down);
         return true;
       } 
       else {
@@ -172,40 +172,53 @@ void volume(SerialData &data)
   }
 }
 
-void smoothEye(int targetPosEyeBall, float moveRate)
+bool smothEyeLid(SerialData &data, float moveRate)
+{
+  static float currentPosEyeLid = lidClosed;
+  if (data.eyelid == 1)
+  {
+    currentPosEyeLid = (lidOpen * moveRate) + (currentPosEyeLid * (1.0 - moveRate));
+    currentPosEyeLid = constrain(currentPosEyeLid, lidOpen, lidClosed);
+    eyeLid.write(currentPosEyeLid);
+    return true;
+  }
+  else 
+  {
+    currentPosEyeLid = (lidClosed * moveRate) + (currentPosEyeLid * (1.0 - moveRate));
+    currentPosEyeLid = constrain(currentPosEyeLid, lidOpen, lidClosed);
+    eyeLid.write( currentPosEyeLid);
+    return false;
+  }
+}
+
+void smoothEyeBall(SerialData &data, float moveRate)
 {
   static float currentPosEyeBall = ballLeft + (ballRight - ballLeft) / 2;
   static float prevTargetPosEyeBall = currentPosEyeBall;
   static float currentPosEyeLid = lidClosed;
-  //eyeBall.attach(EYEBALL_PIN);
-  //eyeLid.attach(EYELID_PIN);
-  if (abs(targetPosEyeBall - currentPosEyeBall) >= 1)
-  {
-    currentPosEyeBall = constrain((targetPosEyeBall * moveRate) + (currentPosEyeBall * (1.0 - moveRate)), ballLeft, ballRight);
-    eyeBall.write(currentPosEyeBall);
-    Serial.println(currentPosEyeBall);
 
-    if (abs(currentPosEyeBall - prevTargetPosEyeBall) < abs(targetPosEyeBall - prevTargetPosEyeBall) / 2)
+  if (abs(data.eyeball - currentPosEyeBall) >= 1)
+  {
+    currentPosEyeBall = (data.eyeball * moveRate) + (currentPosEyeBall * (1.0 - moveRate));
+    currentPosEyeBall = constrain(currentPosEyeBall, ballLeft, ballRight);
+    eyeBall.write( currentPosEyeBall);
+
+    if (abs(currentPosEyeBall - prevTargetPosEyeBall) < abs(data.eyeball - prevTargetPosEyeBall) / 2)
     {
-      currentPosEyeLid = constrain((lidClosed * moveRate) + (currentPosEyeLid * (1.0 - moveRate)), lidOpen, lidClosed);
-      eyeLid.write(currentPosEyeLid);
+      currentPosEyeLid = (lidClosed * moveRate) + (currentPosEyeLid * (1.0 - moveRate));
+      currentPosEyeLid = constrain(currentPosEyeLid, lidOpen, lidClosed);
+      eyeLid.write( currentPosEyeLid);
     }
     else
     {
-      currentPosEyeLid = constrain((lidOpen * moveRate) + (currentPosEyeLid * (1.0 - moveRate)), lidOpen, lidClosed);
+      currentPosEyeLid = (lidOpen * moveRate) + (currentPosEyeLid * (1.0 - moveRate));
+      currentPosEyeLid = constrain(currentPosEyeLid, lidOpen, lidClosed);
       eyeLid.write(currentPosEyeLid);
     }
   }
-  //eyeBall.detach();
-  //eyeLid.detach();
-  prevTargetPosEyeBall = targetPosEyeBall;
+  prevTargetPosEyeBall = data.eyeball;
 }
 
-void move(SerialData &data)
-{
-  eyeBall.write(data.eyeball);
-  eyeLid.write(data.eyeball);
-}
 
 void cleanPlayingData()
 {

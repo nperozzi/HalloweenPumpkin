@@ -23,6 +23,7 @@ Version:
 
 SerialData myData;
 int savedLight = 0;
+bool eyeIsOpen = false;
 
 void setup()
 {
@@ -69,11 +70,13 @@ void loop()
   if( readSerialData(myData) == true)
   {
     //Eye
+    eyeIsOpen = smothEyeLid(myData, 0.35);
 
-    if (myData.eyeball != 0)
+    if (myData.eyeball != 0 && eyeIsOpen)
     {
-      smoothEye(myData.eyeball, 0.1);
+      smoothEyeBall(myData, 0.35);
     }
+    
     
     //Volume
     volume(myData);
