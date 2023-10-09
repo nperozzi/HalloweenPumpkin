@@ -8,6 +8,8 @@ Hardware:
   This code has been made to work on a Teensy 3.5 according to the schematics in the project files.
 Version:
   Code migrated to PlatformIO
+
+  TODO: Add "U can´t touch this by MC Hummer"
 */ 
 #include "helper.h"
 
@@ -19,121 +21,87 @@ Version:
 #define SDCARD_MOSI_PIN 11
 #define SDCARD_SCK_PIN 13
 
+SerialData myData;
+int savedLight = 0;
+bool eyeIsOpen = false;
+
 void setup()
 {
   //Bluetooth Serial setup
   Serial1.begin(9600);  //Defining communication rate with the HC-06 bluetooth module. Boud rate is 9600
-  Serial.begin(9600);   //Serial for debugging
+  Serial.begin(9600);   //SERIAL FOR DEBUGGING
   
   //Audio setup:
   AudioMemory(8);
 
-  //SD Card setup:
-  SPI.setMOSI(SDCARD_MOSI_PIN);
-  SPI.setSCK(SDCARD_SCK_PIN);
-
-  if (!SD.begin(BUILTIN_SD_CARD))
-  {
-    Serial1.println("Unable to access the SD card");
-    delay(500);
-  }
-  
   //FastLED Setup:
   FastLED.addLeds<WS2812, LED1_PIN, RGB> (Strip1, NUM_LED1); //Candles Strip setup
   FastLED.addLeds<WS2812, LED2_PIN, RGB> (Strip2, NUM_LED2); //MiniPumpkins Strip setup
   FastLED.setBrightness(50);
+  FastLED.clear();
+
+  //SD Card setup:
+  SPI.setMOSI(SDCARD_MOSI_PIN);
+  SPI.setSCK(SDCARD_SCK_PIN);
+  SD.begin(BUILTIN_SD_CARD);
+
+  //Save and send list of songs
+  saveSongs();
+  sendSongs();
 
   //Volume Setup:
-  amp1.gain(vol);   //vol is a float. vol=0 is not sound. 0.0<vol<1.0 atenuation. 1.0<vol<32767.0
-  Serial1.println(vol);
+  //attachInterrupt(digitalPinToInterrupt(0),getSerialData,CHANGE);
+  amp1.gain(vol);   //vol is a float. vol=0 is not sound. 0.0<vol<1.0 atenuation.
+
+  //Setup eye
+  pinMode(EYEBALL_PIN, OUTPUT);
+  pinMode(EYELID_PIN, OUTPUT);  
+  eyeBall.attach(EYEBALL_PIN);  //TODO: I am not defining the PWM range, do I have to? 1000, 2000ms
+  eyeLid.attach(EYELID_PIN);
+  eyeBall.write(ballLeft);
+  eyeLid.write(lidClosed);
+  //eyeBall.detach();
+  //eyeLid.detach();
 }
 
 void loop()
 {
-  getSerialData();
-  switch(serialData[0])
+  if( readSerialData(myData) == true)
   {
-    //Track: Candles. This is the default track since every time a track finished the serialData array is reset to (0,0,0,0)
-    case 0:
-      Candles();
-      break;
+    //Eye
+    eyeIsOpen = smothEyeLid(myData, 0.35);
+
+    if (myData.eyeball != 0 && eyeIsOpen)
+    {
+      smoothEyeBall(myData, 0.35);
+    }
     
-    //Track: Boo!
-    case 1:                             //When serialData[0] is 1, then the track is triggered
-      Play(serialData[0]);
-      Serial1.println("Available");     //Teensy sends "Available" back to the app so it enables all bottons
-      break;
-  
-    //Track: Scream
-    case 2:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
-        
-    //Track: EvilLaugh
-    case 3:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
+    //Volume
+    volume(myData);
 
-    //Track: Witch
-    case 4:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
-  
-    //Track: Gotcha
-    case 5:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
-  
-    //Track: AGoodLook
-    case 6:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
-  
-    //Track: Thriler01
-    case 7:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
-  
-    //Track MountainKing
-    case 8:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
-        
-    //Track: HarryPotter
-    case 9:
-      Play(serialData[0]);
-      Serial1.println("Available");
-      break;
-  
-    //Track: ColorWheel
-    case 99:
-      while(true){                   //While loop so the ColorWheel keeps going until the button "back" is pressed
-        getSerialData();            //Teensy keeps on reading the serial1 port during the while loop
-        fill_solid(Strip1, NUM_LED1, CRGB(serialData[1],serialData[2],serialData[3]));    //Strip1 follows the wheel color
-        fill_solid(Strip2, NUM_LED2, CRGB(serialData[1],serialData[2],serialData[3]));    //Strip2 follows the wheel color
-        FastLED.show();                                                                   //FastLED shows the color on the strips
-        if(serialData[0]==98){      //Button "Back" is pressed
-          break;
-        }
+    //Light
+    lights(savedLight);
+
+    //Song
+    if(myData.song != 0)
+    {
+      if(playSdWav1.isPlaying() == false)
+      {
+        savedLight = myData.light;
+        playSdWav1.play(songs[myData.song-1]);
       }
-      break;
-
-    //Volumn +:
-    case 101:
-      Volume(serialData[0]);
-      break;
-      
-    //Volumn -:
-    case 100:
-      Volume(serialData[0]);
-      break;
+      else
+      {
+        return;
+      }
+    }
+    else
+    {
+      return;
+    }
   }
-  cleanSerialData();              //serialData array is set to zero so it continues playing Candles. 
+  else
+  {
+    lights(savedLight);
+  }
 }

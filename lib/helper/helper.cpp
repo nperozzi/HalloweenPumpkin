@@ -1,13 +1,12 @@
 #include "makeColor.h"
 #include "helper.h"
 
-//Variable Definitions and Initialization
+char stateFlag = 'N';
 float vol = 0.02;
-CRGB Strip1[NUM_LED1];
-CRGB Strip2[NUM_LED2];
-int fieldIndex = 0;
-uint8_t values[NUM_FIELDS];
-uint8_t serialData[NUM_FIELDS];
+
+//Serial data initialization:
+uint8_t serialData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
+uint8_t playingData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
 
 // Audio Elements:
 // GUItool: begin automatically generated code
@@ -18,174 +17,210 @@ AudioConnection          patchCord1(playSdWav1, 0, amp1, 0);
 AudioConnection          patchCord2(amp1, dac1);
 // GUItool: end automatically generated code
 
-//Create Objects for light sequences:
-FlashSequence flash= FlashSequence();
-MountainKingSequence mountainKing= MountainKingSequence();
+//Songs initialization
+CRGB Strip1[NUM_LED1];
+CRGB Strip2[NUM_LED2];
+int songs_count = 0;
+char songs[MAX_NUM_SONGS][MAX_SONGS_TITLE_LENGTH];
 
-#define num_tracks 9
-char PlayList[num_tracks][20] = {"Boo.wav",
-                                "Scream.wav",
-                                "EvilLaugh.wav",
-                                "Witch.wav",
-                                "Gotcha.wav",
-                                "AGoodLook.wav",
-                                "Thriler01.wav",
-                                "MountainKing.wav",
-                                "HarryPotter.wav"};
+//Lights initialization:
+FlashSequence flash = FlashSequence();
+MountainKingSequence mountainKing = MountainKingSequence();
 
-void getSerialData()  //TODO: Why the serial data is a array of 4?
+//Eye initialization
+PWMServo eyeBall = PWMServo();
+PWMServo eyeLid = PWMServo();
+int ballLeft = 47;
+int ballRight = 112;
+int lidOpen = 110;
+int lidClosed = 170;
+
+void saveSongs()
 {
-  while(Serial1.available())
+  File root = SD.open("/");
+  if (root)
   {
-    char ch = Serial1.read();
-    if(ch >= '0' && ch <= '9')             //Add up the chars camming into the serial to build each element of the array
+    while(File file = root.openNextFile())
     {
-      values[fieldIndex] = (values[fieldIndex] * 10) + (ch - '0');
+      strcpy(songs[songs_count], file.name());
+      songs_count++;
+      file.close();
     }
-    else if(ch == ',')                  //If there is a "," it means that one emenet has ended and it is time to sart adding up the next elment
+    root.close();
+  }
+}
+
+void sendSongs()
+{
+  while(Serial1.available() == 0)
+  {
+  }
+  if(Serial1.available() > 0)
+  {
+    stateFlag = Serial1.read();
+  }
+  if (stateFlag == 'S')   //TODO: The device should be checking every x amount of time if there is a connection established and if not, go back to a disconnected mode.
+  {
+    Serial.println("Songs transfer started");
+    for(int i = 0; i < songs_count; i++)
     {
-      if(fieldIndex < NUM_FIELDS - 1){
-        fieldIndex++;
-      }
+      Serial1.println(songs[i]);
     }
-    else if(ch == 'F')                   //If there is an "F", that means that one array has ended and it is time to start reading the next one.
+  }
+}
+
+bool readSerialData(SerialData &data) {
+  static char serialBuffer[15]; //QUESTION: why buffer 15bytes?
+  static unsigned int bufferIndex = 0;
+  char endMarker = '\n';
+
+  while (Serial1.available()) 
+  {
+    char receivedChar = Serial1.read();
+    if (receivedChar != endMarker) 
     {
-      for(int i = 0; i <= NUM_FIELDS - 1; i++)
+      if (bufferIndex < sizeof(serialBuffer) - 1) 
       {
-        serialData[i] = values[i];
-        values[i] = 0;
+        serialBuffer[bufferIndex++] = receivedChar;
+      } else {
+        // Buffer overflow, clear the buffer
+        bufferIndex = 0;
       }
-      fieldIndex = 0;
+    } 
+    else {
+      // Null-terminate the buffer
+      serialBuffer[bufferIndex] = '\0';  //QUESTION: why do we need to add the '\0' char to the buffer?
+
+      int result = sscanf(serialBuffer, "%d,%d,%d,%d,%d,%d", &data.song, &data.light, &data.eyeball, &data.eyelid, &data.vol_up, &data.vol_down);
+      bufferIndex = 0; // Reset buffer index
+
+      if (result == 6) {
+        Serial.print(data.song);Serial.print(", ");
+        Serial.print(data.light);Serial.print(", ");
+        Serial.print(data.eyeball);Serial.print(", ");
+        Serial.print(data.eyelid);Serial.print(", ");
+        Serial.print(data.vol_up);Serial.print(", ");
+        Serial.println(data.vol_down);
+        return true;
+      } 
+      else {
+        return false;
+      }
     }
   }
+  return false;
 }
 
-//Function to make the serialData array (0,0,0,0)
-void cleanSerialData()
+void lights(int value)
 {
-  for(int i = 0; i <= NUM_FIELDS - 1; i++)
-  {
-    serialData[i] = 0; 
-  }
-}
-
-void Play(int value)
-{
-  if(playSdWav1.isPlaying() == false)
+  if(playSdWav1.isPlaying() == true)
   {
     switch(value)
-    {  
-      case 1: //Play: Boo!       TODO: Reduce repetition. make each case a signle function.
-        Serial1.println("PlayingBoo");
-        playSdWav1.play(PlayList[value - 1]);           //Playing "value-1" beause that is the position of the right song on the PlayList array.
-        delay(20);                                    // wait for library to pass WAV info
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::White, 60);    //60 is the frequency of the fliquering, which seems right for the song.
-          fill_solid(Strip2, NUM_LED2, CRGB::Black); //Turn off Strip2
-        }
+    {
+      case 1:
+        flash.runFlashSequence(CRGB::White,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
         break;
-
-      //Play: Scream
       case 2:
-        Serial1.println("PlayingScream");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::Green, 60); 
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-        }
+        flash.runFlashSequence(CRGB::Red,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
         break;
-
-      //Play: EvilLaugh
       case 3:
-        Serial1.println("PlayingEvilLaugh");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::Red, 60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-        }
+        rainbow(5000);
         break;
-
-      //Play: Witch
       case 4:
-        Serial1.println("PlayingWitch");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::Green, 60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-        }
+        flash.runFlashSequence(CRGB::Purple,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
         break;
-
-      //Play: Gotcha
       case 5:
-        Serial1.println("PlayingGotcha");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::Red, 60);
-          fill_solid(Strip2, NUM_LED2, CRGB::Black); 
-        }
+        flashThreeColors(CRGB::Red, CRGB::Green, CRGB::Blue, 250);
         break;
-
-      //Play: AGoodLook
       case 6:
-        Serial1.println("PlayingAGoodLook");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          flash.runFlashSequence(CRGB::White, 60); 
-          fill_solid(Strip2, NUM_LED2, CRGB::Black);
-        }
+        flashThreeColors(CRGB::Orange, CRGB::Yellow, CRGB::Violet, 250);
         break;
-
-      //Play: Thriler01
       case 7:
-        Serial1.println("PlayingThriler");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true) {
-          FlashMultiColor();
-        }
+        rainbow(5000);
         break;
-
-      //Play: MountainKing
       case 8:
-        Serial1.println("PlayingMountainKing");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          mountainKing.runMountainKingSequence(500);
-          
-          //MountainKing boo flash
-          unsigned int time1=6858;
-          while(playSdWav1.positionMillis() >= time1)
-          {
-            flash.runFlashSequence(CRGB::White, 60);
-            fill_solid(Strip2, NUM_LED2, CRGB::White);
-          }
-        }
-        break;
-
-      //Play: HarryPotter
-      case 9:
-        Serial1.println("PlayingHarryPotter");
-        playSdWav1.play(PlayList[value - 1]);
-        delay(20);
-        while(playSdWav1.isPlaying() == true)
-        {
-          mountainKing.runMountainKingSequence(1000);
-        }
+        mountainKing.runMountainKingSequence(500);
         break;
     }
+  }
+  else
+  {
+    Candles();
+  }
+}
+
+void volume(SerialData &data)
+{
+  if(data.vol_up == 1)
+  {
+    vol = constrain(vol + VOL_CHANGE, VOL_MIN, VOL_MAX);
+    amp1.gain(vol);
+    Serial1.println(vol);
+  }
+  else if(data.vol_down == 1)
+  {
+    vol = constrain(vol - VOL_CHANGE, VOL_MIN, VOL_MAX);
+    amp1.gain(vol);
+    Serial1.println(vol);
+  }
+}
+
+bool smothEyeLid(SerialData &data, float moveRate)
+{
+  static float currentPosEyeLid = lidClosed;
+  if (data.eyelid == 1)
+  {
+    currentPosEyeLid = (lidOpen * moveRate) + (currentPosEyeLid * (1.0 - moveRate));
+    currentPosEyeLid = constrain(currentPosEyeLid, lidOpen, lidClosed);
+    eyeLid.write(currentPosEyeLid);
+    return true;
+  }
+  else 
+  {
+    currentPosEyeLid = (lidClosed * moveRate) + (currentPosEyeLid * (1.0 - moveRate));
+    currentPosEyeLid = constrain(currentPosEyeLid, lidOpen, lidClosed);
+    eyeLid.write( currentPosEyeLid);
+    return false;
+  }
+}
+
+void smoothEyeBall(SerialData &data, float moveRate)
+{
+  static float currentPosEyeBall = ballLeft + (ballRight - ballLeft) / 2;
+  static float prevTargetPosEyeBall = currentPosEyeBall;
+  static float currentPosEyeLid = lidClosed;
+
+  if (abs(data.eyeball - currentPosEyeBall) >= 1)
+  {
+    currentPosEyeBall = (data.eyeball * moveRate) + (currentPosEyeBall * (1.0 - moveRate));
+    currentPosEyeBall = constrain(currentPosEyeBall, ballLeft, ballRight);
+    eyeBall.write( currentPosEyeBall);
+
+    if (abs(currentPosEyeBall - prevTargetPosEyeBall) < abs(data.eyeball - prevTargetPosEyeBall) / 2)
+    {
+      currentPosEyeLid = (lidClosed * moveRate) + (currentPosEyeLid * (1.0 - moveRate));
+      currentPosEyeLid = constrain(currentPosEyeLid, lidOpen, lidClosed);
+      eyeLid.write( currentPosEyeLid);
+    }
+    else
+    {
+      currentPosEyeLid = (lidOpen * moveRate) + (currentPosEyeLid * (1.0 - moveRate));
+      currentPosEyeLid = constrain(currentPosEyeLid, lidOpen, lidClosed);
+      eyeLid.write(currentPosEyeLid);
+    }
+  }
+  prevTargetPosEyeBall = data.eyeball;
+}
+
+void cleanPlayingData()
+{
+  for(int i = 0; i <= 2; i++)
+  {
+    playingData[i] = 0;
+
   }
 }
 
@@ -209,57 +244,68 @@ void Candles(){
   }
 }
 
-void FlashMultiColor()
+void flashThreeColors(CRGB color0, CRGB color1, CRGB color2, uint16_t frequency)
 {
-  #define RED    0xFF0000
-  #define GREEN  0x00FF00
-  #define BLUE   0x0000FF
-  int numColors = 3;
-  int colors[] = {RED, BLUE, GREEN};
-  int tempo = 250;
-  while(playSdWav1.isPlaying() == true)
+  static uint32_t prevMillis = 0;
+  static uint8_t colorIndex = 0;
+  static bool isColor = false;
+  unsigned long currentMillis = millis();
+  
+  if (currentMillis - prevMillis >= frequency)
   {
-    for(int j = 0; j<numColors;j++)
+    prevMillis = currentMillis;
+
+    if(isColor)
     {
-      for(int i = 0; i < NUM_LED1; i++)
-      {
-        Strip1[i] = colors[j];
-        FastLED.show(); 
-      }
-      for (int i = 0; i < NUM_LED2; i++) {
-        Strip2[i] = colors[j];
-        FastLED.show(); 
-      }
-      delay(tempo);
+      fill_solid(Strip1, NUM_LED1, CRGB::Black);
     }
+    else
+    {
+      switch(colorIndex)
+      {
+        case 0:
+          fill_solid(Strip1, NUM_LED1, color0);
+          fill_solid(Strip2, NUM_LED2, color0);
+          break;
+        case 1:
+          fill_solid(Strip1, NUM_LED1, color1);
+          fill_solid(Strip2, NUM_LED2, color1);
+          break;
+        case 2:
+          fill_solid(Strip1, NUM_LED1, color2);
+          fill_solid(Strip2, NUM_LED2, color2);
+          break;
+      }
+    }
+    FastLED.show();
+    isColor = !isColor;
+    if(isColor == false)
+    {
+      colorIndex = (colorIndex + 1) % 3;
+    }
+
   }
 }
 
-void Volume(int value)
+void rainbow(uint16_t rainbowCycleTime)
 {
-  switch (value)  //TODO: Maybe this can be an if instead of a switch?
+  static uint32_t prevMillis = 0;
+  static uint8_t colorIndex = 0;
+  unsigned long currentMillis = millis();
+  if (currentMillis - prevMillis >= rainbowCycleTime / 256)
   {
-    case 101:
-      vol = vol + 0.02; //TODO: No hardcoded values
-      if(vol >= 0.6)   //TODO: Can I use a "constrain" function here?
-      {
-        vol=0.6;
-      }
-      amp1.gain(vol);
-      Serial1.println(vol);
-      Serial.println(vol);  //DEBUGGING LINE
-      break;
-      
-    case 100:
-      vol=vol-0.02;
-      if(vol>=0.6)           //TODO: Test if you can push the limit higher
-      {
-        vol=0.6;
-      }
-      amp1.gain(vol);
-      Serial1.println(vol);
-      Serial.println(vol); //DEBUGGING LINE
-      break;
+    prevMillis = currentMillis;
+
+    for (int i = 0; i < NUM_LED1; i++)
+    {
+      Strip1[i] = CHSV(colorIndex + (i * 256/NUM_LED1), 255, 255);
+    }
+    FastLED.show();
+    colorIndex++;
+    if(colorIndex > 255)
+    {
+      colorIndex = 0;
+    }  
   }
 }
 
@@ -292,3 +338,4 @@ void FlashSequence::runFlashSequence(CRGB color, uint32_t eventFrequency)
   }
   FastLED.show();  
 }
+
