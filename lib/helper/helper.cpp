@@ -1,17 +1,12 @@
 #include "makeColor.h"
 #include "helper.h"
 
-
 char stateFlag = 'N';
 float vol = 0.02;
-
-//Variable Definitions and Initialization
 
 //Serial data initialization:
 uint8_t serialData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
 uint8_t playingData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
-
-
 
 // Audio Elements:
 // GUItool: begin automatically generated code
@@ -28,13 +23,9 @@ CRGB Strip2[NUM_LED2];
 int songs_count = 0;
 char songs[MAX_NUM_SONGS][MAX_SONGS_TITLE_LENGTH];
 
-
-
 //Lights initialization:
 FlashSequence flash = FlashSequence();
 MountainKingSequence mountainKing = MountainKingSequence();
-
-
 
 //Eye initialization
 PWMServo eyeBall = PWMServo();
@@ -43,7 +34,6 @@ int ballLeft = 47;
 int ballRight = 112;
 int lidOpen = 110;
 int lidClosed = 170;
-
 
 void saveSongs()
 {
@@ -136,8 +126,7 @@ void lights(int value)
         fill_solid(Strip2, NUM_LED2, CRGB::Black);
         break;
       case 3:
-        flash.runFlashSequence(CRGB::Green,60);
-        fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        rainbow(5000);
         break;
       case 4:
         flash.runFlashSequence(CRGB::Purple,60);

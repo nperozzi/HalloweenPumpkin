@@ -31,7 +31,6 @@ void setup()
   Serial1.begin(9600);  //Defining communication rate with the HC-06 bluetooth module. Boud rate is 9600
   Serial.begin(9600);   //SERIAL FOR DEBUGGING
   
-  
   //Audio setup:
   AudioMemory(8);
 
@@ -76,7 +75,6 @@ void loop()
     {
       smoothEyeBall(myData, 0.35);
     }
-    
     
     //Volume
     volume(myData);

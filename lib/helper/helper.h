@@ -100,5 +100,4 @@ void Candles();
 void flashThreeColors(CRGB color0, CRGB color1, CRGB color2, uint16_t frequency);
 void rainbow(uint16_t rainbowCycleTime);
 
-
 #endif
