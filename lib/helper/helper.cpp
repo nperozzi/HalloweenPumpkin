@@ -69,7 +69,7 @@ void sendSongs()
   {
     stateFlag = Serial1.read();
   }
-  if (stateFlag == 'S')
+  if (stateFlag == 'S')   //TODO: The device should be checking every x amount of time if there is a connection established and if not, go back to a disconnected mode.
   {
     Serial.println("Songs transfer started");
     for(int i = 0; i < songs_count; i++)
@@ -136,7 +136,8 @@ void lights(int value)
         fill_solid(Strip2, NUM_LED2, CRGB::Black);
         break;
       case 3:
-        rainbow(5000);
+        flash.runFlashSequence(CRGB::Green,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
         break;
       case 4:
         flash.runFlashSequence(CRGB::Purple,60);
@@ -146,6 +147,12 @@ void lights(int value)
         flashThreeColors(CRGB::Red, CRGB::Green, CRGB::Blue, 250);
         break;
       case 6:
+        flashThreeColors(CRGB::Orange, CRGB::Yellow, CRGB::Violet, 250);
+        break;
+      case 7:
+        rainbow(5000);
+        break;
+      case 8:
         mountainKing.runMountainKingSequence(500);
         break;
     }
@@ -218,7 +225,6 @@ void smoothEyeBall(SerialData &data, float moveRate)
   }
   prevTargetPosEyeBall = data.eyeball;
 }
-
 
 void cleanPlayingData()
 {
