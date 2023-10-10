@@ -30,10 +30,10 @@ MountainKingSequence mountainKing = MountainKingSequence();
 //Eye initialization
 PWMServo eyeBall = PWMServo();
 PWMServo eyeLid = PWMServo();
-int ballLeft = 47;
-int ballRight = 112;
-int lidOpen = 110;
-int lidClosed = 170;
+int ballLeft = 53;
+int ballRight = 180;
+int lidOpen = 75;
+int lidClosed = 127;
 
 void saveSongs()
 {

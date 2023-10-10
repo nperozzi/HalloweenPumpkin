@@ -69,7 +69,7 @@ void loop()
   if( readSerialData(myData) == true)
   {
     //Eye
-    eyeIsOpen = smothEyeLid(myData, 0.35);
+    eyeIsOpen = smothEyeLid(myData, 0.60);
 
     if (myData.eyeball != 0 && eyeIsOpen)
     {
