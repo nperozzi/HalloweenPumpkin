@@ -32,7 +32,7 @@ void setup()
   Serial.begin(9600);   //SERIAL FOR DEBUGGING
   
   //Audio setup:
-  AudioMemory(8);
+  AudioMemory(16);
 
   //FastLED Setup:
   FastLED.addLeds<WS2812, LED1_PIN, RGB> (Strip1, NUM_LED1); //Candles Strip setup
