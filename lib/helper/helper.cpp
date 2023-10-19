@@ -126,7 +126,8 @@ void lights(int value)
         fill_solid(Strip2, NUM_LED2, CRGB::Black);
         break;
       case 3:
-        rainbow(5000);
+        flash.runFlashSequence(CRGB::Green,60);
+        fill_solid(Strip2, NUM_LED2, CRGB::Black);
         break;
       case 4:
         flash.runFlashSequence(CRGB::Purple,60);
@@ -136,7 +137,7 @@ void lights(int value)
         flashThreeColors(CRGB::Red, CRGB::Green, CRGB::Blue, 250);
         break;
       case 6:
-        flashThreeColors(CRGB::Orange, CRGB::Yellow, CRGB::Violet, 250);
+        flashThreeColors(CRGB::Orange, CRGB::Green, CRGB::Purple, 250);
         break;
       case 7:
         rainbow(5000);

@@ -60,8 +60,6 @@ void setup()
   eyeLid.attach(EYELID_PIN);
   eyeBall.write(ballLeft);
   eyeLid.write(lidClosed);
-  //eyeBall.detach();
-  //eyeLid.detach();
 }
 
 void loop()
