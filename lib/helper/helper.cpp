@@ -1,14 +1,17 @@
 #include "makeColor.h"
 #include "helper.h"
 
+//Variables initialization for savingSongs
 char stateFlag = 'N';
-float vol = 0.02;
 
+//elapsedMillis object declaration
 elapsedMillis timer;
+
+//Volume variable initialization
+float vol = 0.02;
 
 //Serial data initialization:
 uint8_t serialData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
-uint8_t playingData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
 
 // Audio Elements:
 // GUItool: begin automatically generated code
@@ -60,7 +63,7 @@ void sendSongs()
   {
     stateFlag = Serial1.read();
   }
-  if (stateFlag == 'S')   //TODO: The device should be checking every x amount of time if there is a connection established and if not, go back to a disconnected mode.
+  if (stateFlag == 'S')
   {
     Serial.println("Songs transfer started");
     for(int i = 0; i < songs_count; i++)
@@ -71,7 +74,7 @@ void sendSongs()
 }
 
 bool readSerialData(SerialData &data) {
-  static char serialBuffer[15]; //QUESTION: why buffer 15bytes?
+  static char serialBuffer[16]; //The whole message is 16 char)
   static unsigned int bufferIndex = 0;
   char endMarker = '\n';
 
@@ -90,7 +93,7 @@ bool readSerialData(SerialData &data) {
     } 
     else {
       // Null-terminate the buffer
-      serialBuffer[bufferIndex] = '\0';  //QUESTION: why do we need to add the '\0' char to the buffer?
+      serialBuffer[bufferIndex] = '\0';
 
       int result = sscanf(serialBuffer, "%d,%d,%d,%d,%d,%d", &data.song, &data.light, &data.eyeball, &data.eyelid, &data.vol_up, &data.vol_down);
       bufferIndex = 0; // Reset buffer index
@@ -221,15 +224,6 @@ void smoothEyeBall(SerialData &data, float moveRate)
   prevTargetPosEyeBall = data.eyeball;
 }
 
-void cleanPlayingData()
-{
-  for(int i = 0; i <= 2; i++)
-  {
-    playingData[i] = 0;
-
-  }
-}
-
 void Candles(){
   FastLED.setBrightness(50);
   if(playSdWav1.isPlaying() == false)
@@ -261,7 +255,6 @@ void soundSyncLight()
     {
       int value = peak.read() * 100.0;
       value = map(value, 0, 100, 0, 100);
-      Serial.println(value);
       FastLED.setBrightness(value);
       FastLED.show();
     }

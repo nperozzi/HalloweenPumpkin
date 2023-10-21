@@ -1,20 +1,7 @@
 /*
 HalloweenPumpkinV3
-Decription:
-  A HalloweenPumpkin that reproduces "tracks" (sound and a light sequence) when triggered via bluetooth.
-  The bluetooth transmitor the MIT App Inventory app "HalloweenPumpkinAppV2"
-
-Hardware:
-  This code has been made to work on a Teensy 3.5 according to the schematics in the project files.
-Version:
-  Code migrated to PlatformIO
-
-  TODO: Add "U can´t touch this by MC Hummer"
-*/ 
+*/
 #include "helper.h"
-
-//Desabling Interrupts
-//#define FASTLED_ALLOW_INTERRUPTS 0  //NOTE: seems to work without desabling interrupts.
 
 //SD Card elements:
 #define BUILTIN_SD_CARD BUILTIN_SDCARD
@@ -50,13 +37,12 @@ void setup()
   sendSongs();
 
   //Volume Setup:
-  //attachInterrupt(digitalPinToInterrupt(0),getSerialData,CHANGE);
   amp1.gain(vol);   //vol is a float. vol=0 is not sound. 0.0<vol<1.0 atenuation.
 
   //Setup eye
   pinMode(EYEBALL_PIN, OUTPUT);
   pinMode(EYELID_PIN, OUTPUT);  
-  eyeBall.attach(EYEBALL_PIN);  //TODO: I am not defining the PWM range, do I have to? 1000, 2000ms
+  eyeBall.attach(EYEBALL_PIN);
   eyeLid.attach(EYELID_PIN);
   eyeBall.write(ballLeft);
   eyeLid.write(lidClosed);
@@ -68,7 +54,6 @@ void loop()
   {
     //Eye
     eyeIsOpen = smothEyeLid(myData, 0.60);
-
     if (myData.eyeball != 0 && eyeIsOpen)
     {
       smoothEyeBall(myData, 0.35);
@@ -88,14 +73,6 @@ void loop()
         savedLight = myData.light;
         playSdWav1.play(songs[myData.song-1]);
       }
-      else
-      {
-        return;
-      }
-    }
-    else
-    {
-      return;
     }
   }
   else

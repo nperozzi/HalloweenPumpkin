@@ -1,13 +1,15 @@
 #ifndef CUSTOMMETHODS_H
 #define CUSTOMMETHODS_H
 
-#include <Arduino.h>
 #include <Audio.h>
 #include <SerialFlash.h>
 #include <SPI.h>
 #include <SD.h>
 #include <FastLED.h>
 #include <PWMServo.h>
+
+//Variables declaration for savingSongs
+extern char stateFlag;
 
 //Volume variables declarations
 extern float vol;
@@ -57,8 +59,9 @@ extern AudioConnection          patchCord3;
 //Bluetooth Elements:
 const int NUM_DATA_FIELDS = 6;
 extern  uint8_t serialData[NUM_DATA_FIELDS];
-extern uint8_t playingData[NUM_DATA_FIELDS];
-struct SerialData {
+//extern uint8_t playingData[NUM_DATA_FIELDS];
+struct SerialData 
+{
   int song;
   int light;
   int eyeball;
@@ -67,8 +70,6 @@ struct SerialData {
   int vol_down;
 };
 
-extern char stateFlag;
-
 void saveSongs();
 void sendSongs();
 bool readSerialData(SerialData &data);
@@ -76,7 +77,6 @@ void lights(int value);
 void volume(SerialData &data);
 bool smothEyeLid(SerialData &data, float moveRate);
 void smoothEyeBall(SerialData &data, float moveRate);
-void cleanPlayingData();
 void soundSyncLight();
 void Candles();
 void flashThreeColors(CRGB color0, CRGB color1, CRGB color2, uint16_t frequency);
