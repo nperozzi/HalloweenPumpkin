@@ -4,6 +4,8 @@
 char stateFlag = 'N';
 float vol = 0.02;
 
+elapsedMillis timer;
+
 //Serial data initialization:
 uint8_t serialData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
 uint8_t playingData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
@@ -13,8 +15,10 @@ uint8_t playingData[NUM_DATA_FIELDS] = {0, 0, 0, 0, 0, 0};
 AudioPlaySdWav           playSdWav1;
 AudioAmplifier           amp1;
 AudioOutputAnalog        dac1;
+AudioAnalyzePeak         peak;
 AudioConnection          patchCord1(playSdWav1, 0, amp1, 0);
 AudioConnection          patchCord2(amp1, dac1);
+AudioConnection          patchCord3(playSdWav1, peak);
 // GUItool: end automatically generated code
 
 //Songs initialization
@@ -23,10 +27,6 @@ CRGB Strip2[NUM_LED2];
 int songs_count = 0;
 char songs[MAX_NUM_SONGS][MAX_SONGS_TITLE_LENGTH];
 
-//Lights initialization:
-FlashSequence flash = FlashSequence();
-MountainKingSequence mountainKing = MountainKingSequence();
-
 //Eye initialization
 PWMServo eyeBall = PWMServo();
 PWMServo eyeLid = PWMServo();
@@ -34,6 +34,7 @@ int ballLeft = 53;
 int ballRight = 180;
 int lidOpen = 75;
 int lidClosed = 127;
+
 
 void saveSongs()
 {
@@ -95,12 +96,12 @@ bool readSerialData(SerialData &data) {
       bufferIndex = 0; // Reset buffer index
 
       if (result == 6) {
-        Serial.print(data.song);Serial.print(", ");
-        Serial.print(data.light);Serial.print(", ");
-        Serial.print(data.eyeball);Serial.print(", ");
-        Serial.print(data.eyelid);Serial.print(", ");
-        Serial.print(data.vol_up);Serial.print(", ");
-        Serial.println(data.vol_down);
+        //Serial.print(data.song);Serial.print(", ");
+        //Serial.print(data.light);Serial.print(", ");
+        //Serial.print(data.eyeball);Serial.print(", ");
+        //Serial.print(data.eyelid);Serial.print(", ");
+        //Serial.print(data.vol_up);Serial.print(", ");
+        //Serial.println(data.vol_down);
         return true;
       } 
       else {
@@ -118,32 +119,36 @@ void lights(int value)
     switch(value)
     {
       case 1:
-        flash.runFlashSequence(CRGB::White,60);
+        fill_solid(Strip1, NUM_LED1, CRGB::White);
         fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        soundSyncLight();
         break;
       case 2:
-        flash.runFlashSequence(CRGB::Red,60);
+        fill_solid(Strip1, NUM_LED1, CRGB::Red);
         fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        soundSyncLight();
         break;
       case 3:
-        flash.runFlashSequence(CRGB::Green,60);
+        fill_solid(Strip1, NUM_LED1, CRGB::Green);
         fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        soundSyncLight();
         break;
       case 4:
-        flash.runFlashSequence(CRGB::Purple,60);
+        fill_solid(Strip1, NUM_LED1, CRGB::Purple);
         fill_solid(Strip2, NUM_LED2, CRGB::Black);
+        soundSyncLight();
         break;
       case 5:
         flashThreeColors(CRGB::Red, CRGB::Green, CRGB::Blue, 250);
         break;
       case 6:
-        flashThreeColors(CRGB::Orange, CRGB::Green, CRGB::Purple, 250);
+        flashThreeColors(CRGB::Purple, CRGB::Green,CRGB::Orange, 250);
         break;
       case 7:
         rainbow(5000);
         break;
       case 8:
-        mountainKing.runMountainKingSequence(500);
+        mountainKing(500);
         break;
     }
   }
@@ -226,6 +231,7 @@ void cleanPlayingData()
 }
 
 void Candles(){
+  FastLED.setBrightness(50);
   if(playSdWav1.isPlaying() == false)
   {
     for(int i = 0; i < NUM_LED1; i++)
@@ -245,17 +251,32 @@ void Candles(){
   }
 }
 
+void soundSyncLight()
+{
+  if (timer > 24)
+  {
+    timer = 0;
+    
+    if (peak.available())
+    {
+      int value = peak.read() * 100.0;
+      value = map(value, 0, 100, 0, 100);
+      Serial.println(value);
+      FastLED.setBrightness(value);
+      FastLED.show();
+    }
+  }
+}
+
 void flashThreeColors(CRGB color0, CRGB color1, CRGB color2, uint16_t frequency)
 {
   static uint32_t prevMillis = 0;
   static uint8_t colorIndex = 0;
   static bool isColor = false;
   unsigned long currentMillis = millis();
-  
   if (currentMillis - prevMillis >= frequency)
   {
     prevMillis = currentMillis;
-
     if(isColor)
     {
       fill_solid(Strip1, NUM_LED1, CRGB::Black);
@@ -266,15 +287,15 @@ void flashThreeColors(CRGB color0, CRGB color1, CRGB color2, uint16_t frequency)
       {
         case 0:
           fill_solid(Strip1, NUM_LED1, color0);
-          fill_solid(Strip2, NUM_LED2, color0);
+          fill_solid(Strip2, NUM_LED2, color1);
           break;
         case 1:
           fill_solid(Strip1, NUM_LED1, color1);
-          fill_solid(Strip2, NUM_LED2, color1);
+          fill_solid(Strip2, NUM_LED2, color2);
           break;
         case 2:
           fill_solid(Strip1, NUM_LED1, color2);
-          fill_solid(Strip2, NUM_LED2, color2);
+          fill_solid(Strip2, NUM_LED2, color0);
           break;
       }
     }
@@ -288,33 +309,31 @@ void flashThreeColors(CRGB color0, CRGB color1, CRGB color2, uint16_t frequency)
   }
 }
 
-void rainbow(uint16_t rainbowCycleTime)
+void rainbow(uint16_t durationMs)
 {
   static uint32_t prevMillis = 0;
-  static uint8_t colorIndex = 0;
+  static uint8_t hue = 0;
   unsigned long currentMillis = millis();
-  if (currentMillis - prevMillis >= rainbowCycleTime / 256)
+  if (currentMillis - prevMillis >= durationMs / 256)
   {
     prevMillis = currentMillis;
 
-    for (int i = 0; i < NUM_LED1; i++)
-    {
-      Strip1[i] = CHSV(colorIndex + (i * 256/NUM_LED1), 255, 255);
-    }
+    fill_solid(Strip1, NUM_LED1, CHSV(hue, 255, 255));
+    fill_solid(Strip2, NUM_LED2, CHSV(hue, 255, 255));
     FastLED.show();
-    colorIndex++;
-    if(colorIndex > 255)
+    hue++;
+    if(hue > 255)
     {
-      colorIndex = 0;
+      hue = 0;
     }  
   }
 }
 
-void MountainKingSequence::runMountainKingSequence(int eventFrequency)
+void mountainKing(int frequency)
 {
-  fill_solid(Strip1, NUM_LED1, CRGB::Black);
   //MiniPumpkins Dance
-  EVERY_N_MILLISECONDS(eventFrequency)
+  fill_solid(Strip1, NUM_LED1, CRGB::Black);
+  EVERY_N_MILLISECONDS(frequency)
   {
     //Create a new pixel for led[0]:
     Strip2[0]=CHSV(random8(), random8(), random8(100, 255));
@@ -326,17 +345,11 @@ void MountainKingSequence::runMountainKingSequence(int eventFrequency)
     }
     FastLED.show();
   }
-}
-
-void FlashSequence::runFlashSequence(CRGB color, uint32_t eventFrequency)
-{
-  uint32_t timeStamp = millis();
-  if((timeStamp - lastEvent) >= eventFrequency)
+  uint32_t songPoint = 6858;
+  while (playSdWav1.positionMillis() >= songPoint)
   {
-    fill_solid(Strip1, NUM_LED1, isOn? CRGB::Black : color);
-    isOn =! isOn;
-    lastEvent = millis();
+    soundSyncLight();  
+    fill_solid(Strip1, NUM_LED1, CRGB::White);
+    fill_solid(Strip2, NUM_LED2, CRGB::Black);
   }
-  FastLED.show();  
 }
-

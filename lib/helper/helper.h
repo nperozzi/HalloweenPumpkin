@@ -50,6 +50,8 @@ extern AudioAmplifier           amp1;
 extern AudioOutputAnalog        dac1;
 extern AudioConnection          patchCord1;
 extern AudioConnection          patchCord2;
+extern AudioAnalyzePeak         peak;
+extern AudioConnection          patchCord3;
 // GUItool: end automatically generated code
 
 //Bluetooth Elements:
@@ -65,28 +67,7 @@ struct SerialData {
   int vol_down;
 };
 
-
 extern char stateFlag;
-
-//Classes:
-class MountainKingSequence{
-  public:
-    MountainKingSequence(){}
-    void runMountainKingSequence(int eventFrequency);   //Member function prototype
-};
-
-class FlashSequence{
-  public:
-    FlashSequence(){}; //Constructor
-    void runFlashSequence(CRGB color, uint32_t eventFrequency);  //Member function prototype
-    
-  private:
-    bool isOn= false; //switching this variable on and off makes the flashing
-    uint32_t lastEvent=0; //timestamp for the previous event  
-};
-
-extern FlashSequence flash;
-extern MountainKingSequence mountainKing;
 
 void saveSongs();
 void sendSongs();
@@ -96,8 +77,10 @@ void volume(SerialData &data);
 bool smothEyeLid(SerialData &data, float moveRate);
 void smoothEyeBall(SerialData &data, float moveRate);
 void cleanPlayingData();
+void soundSyncLight();
 void Candles();
 void flashThreeColors(CRGB color0, CRGB color1, CRGB color2, uint16_t frequency);
 void rainbow(uint16_t rainbowCycleTime);
+void mountainKing(int frequency);
 
 #endif
