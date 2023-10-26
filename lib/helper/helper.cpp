@@ -225,7 +225,7 @@ void smoothEyeBall(SerialData &data, float moveRate)
 }
 
 void Candles(){
-  FastLED.setBrightness(50);
+  FastLED.setBrightness(70);
   if(playSdWav1.isPlaying() == false)
   {
     for(int i = 0; i < NUM_LED1; i++)
