@@ -142,7 +142,7 @@ In this section I describe the content of each of the files uploaded for this pr
 
 | Part Name and links | Qty |
 |---:|:---:|
-| [Teensy 3.5] (https://www.pjrc.com/store/teensy35.html) | 1 |
+| Teensy 3.5 | 1 |
 | XL6009E1 Bost Converter module | 1 |
 | 3 Inch Speaker, 8 Ohm, 20W | 1 |
 | TDA8932 35W Digital Amplifier | 1 |
