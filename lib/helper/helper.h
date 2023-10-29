@@ -31,7 +31,7 @@ extern CRGB Strip1[NUM_LED1];
 
 //Strip2 elements: Mini Pumpkings Strip
 #define LED2_PIN 3
-#define NUM_LED2 3
+#define NUM_LED2 2
 extern CRGB Strip2[NUM_LED2];
 
 //Eye variables declarations:

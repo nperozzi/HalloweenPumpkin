@@ -332,7 +332,7 @@ void mountainKing(int frequency)
     Strip2[0]=CHSV(random8(), random8(), random8(100, 255));
   
     //Copy each pixel to the next one
-    for( int i=3-1; i>0; i--)
+    for( int i=NUM_LED2-1; i>0; i--)
     {
       Strip2[i]= Strip2[i-1];
     }

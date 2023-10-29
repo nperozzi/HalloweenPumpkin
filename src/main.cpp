@@ -22,7 +22,7 @@ void setup()
   AudioMemory(16);
 
   //FastLED Setup:
-  FastLED.addLeds<WS2812, LED1_PIN, GRB> (Strip1, NUM_LED1); //Candles Strip setup
+  FastLED.addLeds<WS2812, LED1_PIN, RGB> (Strip1, NUM_LED1); //Candles Strip setup
   FastLED.addLeds<WS2812, LED2_PIN, GRB> (Strip2, NUM_LED2); //MiniPumpkins Strip setup
   FastLED.setBrightness(70);
   FastLED.clear();
