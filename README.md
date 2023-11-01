@@ -1,5 +1,5 @@
 # Halloween Pumpkins
-## Video Demo:  <URL HERE>
+## Video Demo: <https://www.youtube.com/watch?v=jhRJMaAQkJs>
 ## Description:
 My final CS50 project is a set of four animatronic Halloween pumpkins that feature sound and light effects and an animatronic eye to make it even more spooky. The electronics are embedded into real carved pumpkins to make them realistic. The whole device is controlled with a custom Android application that communicates via Bluetooth with the electronics hosted in the main pumpkin.
 
@@ -208,3 +208,4 @@ Depending on where will you be using the pumpkin, the max and min volume and vol
 | Erasmus C | Erasmus helped me optimize the serial communication function. |
 | Paul Stoffregen | For several of the libraries used in this project plus the development of the Teensy 3.5 |
 | James Bruton | For the development of the animatronic eye design which I modified to fit my application. |
+| Anna Grauers | For supporting me on making this project reality and helping me during the Halloween event which was very rainy. |
